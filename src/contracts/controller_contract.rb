@@ -16,4 +16,11 @@ module ControllerContract
 			"(internally) marked with the player number."
 		)
 	end
+	
+	def play_invariant(column)
+		# TODO: We can also assert that no other columns are affected.
+		previous_number_of_tokens = board.number_of_tokens(column)
+		yield
+		assert_equals(previous_number_of_tokens + 1, board.number_of_tokens(column))
+	end
 end
