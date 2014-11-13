@@ -21,21 +21,6 @@ module GameContract
 			"The game board has a height of 6."
 		)
 	end
-
-	def controllers_postcondition(controllers)
-		assert(controllers.all?{ |c| c.is_a?(ControllerContract) })
-		controller_1, controller_2 = *controllers
-		
-		assert_equals(
-			1, controller_1.player_number,
-			"The first controller will belong to player 1."
-		)
-		
-		assert_equals(
-			2, controller_2.player_number,
-			"The second controller will belong to player 2."
-		)
-	end
 	
 	def play_precondition(column, player_number)
 		assert(1..2 === player_number, "There exists only player 1 and player 2.")
