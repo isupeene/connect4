@@ -8,7 +8,6 @@ module GameManagerContract
 				result.is_a?(ControllerContract),
 				"Starting a new game returns the human player's controller."
 			)
-			assert(game_in_progress)
 		else
 			assert_equals(2, result.length, "Two controllers are returned.")
 			assert(result.all?{ |c| c.is_a?(ControllerContract) })
@@ -17,6 +16,8 @@ module GameManagerContract
 			assert_equals(1, controller_1.player_number)
 			assert_equals(2, controller_2.player_number)
 		end
+		
+		assert(game_in_progress)
 	end
 	
 	def save_game_precondition
@@ -32,11 +33,7 @@ module GameManagerContract
 	end
 	
 	def load_game_postcondition(result)
-		assert(
-			result.is_a?(ControllerContract),
-			"Starting a new game returns the human player's controller."
-		)
-		assert(game_in_progress)
+		start_game_postcondition(current_game.options, result)
 	end
 	
 	def quit_game_precondition
