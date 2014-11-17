@@ -10,7 +10,7 @@ class GameImpl
 		@current_turn = 1
 		@board = GameBoard.new
 
-		@views.each{ |v| v.turn_update(board) }
+		update_views({:board => board, :current_turn => @current_turn})
 		game_thread = Thread.new{ main_loop }
 		game_thread.priority = 3
 	end
@@ -24,16 +24,23 @@ class GameImpl
 		begin
 			command = @commands.pop
 			if command[:cancel]
-				@views.each{ |v| v.game_over(0) }
+				update_views({:game_over => true, :winner => 0})
 				return
 			end
 
 			board.add_token(command[:token], command[:column])
-			@views.each{ |v| v.turn_update(board) }
+			update_views({
+				:board => board,
+				:current_turn => @current_turn
+			})
 
-			victory = @victory_condition.call(board)
-			if victory
-				@views.each{ |v| v.game_over(victory) }
+			winner = @victory_condition.call(board)
+			if winner
+				update_views({
+					:board => board,
+					:game_over => true,
+					:winner => winner
+				})
 				return
 			end
 		rescue Exception => ex
@@ -57,6 +64,10 @@ class GameImpl
 		column >= 0 &&
 		column < board.width &&
 		board.number_of_tokens(column) < board.height
+	end
+
+	def update_views(update)
+		@views.each{ |v| v.turn_update(update) }
 	end
 end
 

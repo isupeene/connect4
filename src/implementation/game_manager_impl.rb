@@ -22,4 +22,13 @@ module GameManagerImpl
 		Connect4AIImpl.new(ai_view, ControllerImpl.new(@@game, 2))
 		return ControllerImpl.new(@@game, 1)
 	end
+
+	def self.end_game
+		@@game.quit
+		@@game = nil
+	end
+
+	def self.game_in_progress
+		!@@game.nil?
+	end
 end

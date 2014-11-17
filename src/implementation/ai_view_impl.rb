@@ -7,12 +7,8 @@ class AIViewImpl
 
 	attr_reader :updates
 
-	def turn_update(board)
-		@updates.push({:board => board})
-	end
-
-	def game_over(winner)
-		@updates.push({:game_over => true, :winner => winner})
+	def turn_update(update)
+		@updates.push(update)
 	end
 end
 

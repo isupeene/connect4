@@ -19,7 +19,7 @@ class GameBoard
 	end
 
 	def [](i, j)
-		@board[j][i]
+		(@board[j] || [])[i]
 	end
 
 	def number_of_tokens(column)

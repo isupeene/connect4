@@ -4,10 +4,17 @@ class CLIConnect4ViewImpl
 		@player_number = player_number
 	end
 
-	def turn_update(board)
-		@out.puts(board.rows.map { |r| 
+	def turn_update(update)
+		@out.puts(update[:board].rows.map { |r| 
 			r.map{ |x| x.nil? ? 0 : x }.join(" ")
 		}.join("\n"))
+		if update[:game_over]
+			game_over(update[:winner])
+		elsif update[:current_turn] == @player_number
+			puts("Your turn.")
+		else
+			puts("AI's turn")
+		end
 	end
 
 	def game_over(winner)
