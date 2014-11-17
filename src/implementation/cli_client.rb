@@ -11,11 +11,11 @@ class CLIClient
 		loop {
 			command = @in.gets.strip
 			if command.to_i.to_s == command
-				place_token(command.to_i)
+				if_game_in_progress{ place_token(command.to_i) }
 			elsif command == "start"
 				start_game
 			elsif command == "quit"
-				end_game
+				if_game_in_progress{ end_game }
 			elsif command == "exit"
 				exit_program
 			else
@@ -30,7 +30,7 @@ class CLIClient
 	end
 
 	def end_game
-		if_game_in_progress{ GameManagerImpl.end_game }
+		GameManagerImpl.end_game
 	end
 
 	def if_game_in_progress
@@ -49,10 +49,12 @@ class CLIClient
 	def place_token(column)
 		if !GameManagerImpl.game_in_progress
 			@out.puts("There is no current game in progress!")
-		elsif @controller.my_turn
-			@controller.play(column)
-		else
+		elsif !@controller.my_turn
 			@out.puts("It's not your turn!")
+		elsif !@controller.game.valid_move(column)
+			@out.puts("You can't move there!")
+		else
+			@controller.play(column)
 		end
 	end
 end

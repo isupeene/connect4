@@ -15,7 +15,8 @@ module GameManagerImpl
 		@@game = GameImpl.new(
 			game_options,
 			ai_view,
-			CLIConnect4ViewImpl.new(STDOUT, 1)
+			CLIConnect4ViewImpl.new(STDOUT, 1),
+			self
 		) { |b| connect4_victory_condition(b) }
 
 		
@@ -30,5 +31,9 @@ module GameManagerImpl
 
 	def self.game_in_progress
 		!@@game.nil?
+	end
+
+	def self.turn_update(update)
+		@@game = nil if update[:game_over]
 	end
 end
