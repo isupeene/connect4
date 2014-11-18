@@ -4,7 +4,7 @@ class CLIClient
 	def initialize(input_stream=STDIN, output_stream=STDOUT)
 		@in = input_stream
 		@out = output_stream
-		@controller = nil
+		@controllers = nil
 
 		@out.puts("Welcome to connect4!")
 
@@ -14,6 +14,8 @@ class CLIClient
 				if_game_in_progress{ place_token(command.to_i) }
 			elsif command == "start"
 				start_game
+			elsif command == "start-solo"
+				start_game({:single_player => true})
 			elsif command == "save"
 				save_game
 			elsif command == "load"
@@ -28,9 +30,9 @@ class CLIClient
 		}
 	end
 
-	def start_game
+	def start_game(options={})
 		@out.puts("Starting a new game...")
-		@controller = GameManagerImpl.start_game
+		@controllers = GameManagerImpl.start_game(options)
 	end
 
 	def end_game
@@ -48,7 +50,7 @@ class CLIClient
 	def load_game
 		if !GameManagerImpl.save_file_present
 			@out.puts("No save file is available to load.")
-		elsif !@controller = GameManagerImpl.load_game
+		elsif !@controllers = GameManagerImpl.load_game
 			@out.puts("An error occurred while loading.")
 		end
 	end
@@ -69,13 +71,21 @@ class CLIClient
 	def place_token(column)
 		if !GameManagerImpl.game_in_progress
 			@out.puts("There is no current game in progress!")
-		elsif !@controller.my_turn
+		elsif !my_turn
 			@out.puts("It's not your turn!")
-		elsif !@controller.game.valid_move(column)
+		elsif !current_controller.game.valid_move(column)
 			@out.puts("You can't move there!")
 		else
-			@controller.play(column)
+			current_controller.play(column)
 		end
+	end
+
+	def current_controller
+		[*@controllers].select{|c| c.my_turn }[0] if @controllers
+	end
+
+	def my_turn
+		!current_controller.nil?
 	end
 end
 

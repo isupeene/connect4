@@ -1,14 +1,14 @@
-class CLIConnect4ViewImpl
+require_relative 'cli_connect4_view'
+
+class CLIConnect4SinglePlayerViewImpl < CLIConnect4View
 	def initialize(output_stream, player_number)
-		@out = output_stream
+		super(output_stream)
 		@player_number = player_number
 	end
 
 	def turn_update(update)
 		if update[:board]
-			@out.puts(update[:board].rows.map { |r| 
-				r.map{ |x| x.nil? ? 0 : x }.join(" ")
-			}.join("\n"))
+			print_board(update[:board])
 		end
 
 		if update[:game_over]
