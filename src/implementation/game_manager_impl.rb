@@ -6,7 +6,9 @@ require_relative 'controller_impl'
 require_relative 'victory_conditions'
 
 module GameManagerImpl
-	def self.start_game(game_options)
+	@@game = nil
+
+	def self.start_game(game_options={})
 		# TODO: For now, we assume CLI, single-player and connect 4.
 		# These can be made part of the game options.
 
@@ -29,8 +31,40 @@ module GameManagerImpl
 		@@game = nil
 	end
 
+	def self.save_game
+		begin
+			File.open("connect4.sav", "w") { |savefile|
+				savefile.write(@@game.save)
+			}
+			return true
+		rescue Exception => ex
+			puts ex
+			return false
+		end
+	end
+
+	def self.load_game
+		begin
+			options = nil
+			File.open("connect4.sav", "r") { |savefile|
+				# Vulnerable to trojans;
+				# Don't play connect4 as root!
+				options = eval(savefile.readlines.join)
+				options[:board] = GameBoard.load(options[:board])
+			}
+			start_game(options)
+		rescue Exception => ex
+			puts ex
+			return nil
+		end
+	end
+
 	def self.game_in_progress
 		!@@game.nil?
+	end
+
+	def self.save_file_present
+		File.file?("connect4.sav")
 	end
 
 	def self.turn_update(update)

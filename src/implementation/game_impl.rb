@@ -7,8 +7,8 @@ class GameImpl
 		@views = views
 		@victory_condition = victory_condition
 		@commands = Queue.new
-		@current_turn = 1
-		@board = GameBoard.new
+		@current_turn = options[:current_turn] || 1
+		@board = options[:board] || GameBoard.new
 
 		update_views({:board => board, :current_turn => @current_turn})
 		game_thread = Thread.new{ main_loop }
@@ -68,6 +68,13 @@ class GameImpl
 
 	def update_views(update)
 		@views.each{ |v| v.turn_update(update) }
+	end
+
+	def save
+		@options.merge({
+			:board => board.to_s,
+			:current_turn => current_turn
+		})
 	end
 end
 

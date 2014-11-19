@@ -49,5 +49,18 @@ class GameBoard
 			c.each_with_index{ |x, i| yield x, i, j }
 		}
 	end
+
+	def to_s
+		@board.to_s
+	end
+
+	attr_accessor :board
+
+	public
+	def self.load(str)
+		result = new
+		result.board = eval(str)
+		return result
+	end
 end
 

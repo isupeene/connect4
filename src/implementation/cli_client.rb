@@ -14,6 +14,10 @@ class CLIClient
 				if_game_in_progress{ place_token(command.to_i) }
 			elsif command == "start"
 				start_game
+			elsif command == "save"
+				save_game
+			elsif command == "load"
+				load_game
 			elsif command == "quit"
 				if_game_in_progress{ end_game }
 			elsif command == "exit"
@@ -26,11 +30,27 @@ class CLIClient
 
 	def start_game
 		@out.puts("Starting a new game...")
-		@controller = GameManagerImpl.start_game(nil)
+		@controller = GameManagerImpl.start_game
 	end
 
 	def end_game
 		GameManagerImpl.end_game
+	end
+
+	def save_game
+		if GameManagerImpl.save_game
+			@out.puts("Saved!")
+		else
+			@out.puts("An error occurred while saving.")
+		end
+	end
+
+	def load_game
+		if !GameManagerImpl.save_file_present
+			@out.puts("No save file is available to load.")
+		elsif !@controller = GameManagerImpl.load_game
+			@out.puts("An error occurred while loading.")
+		end
 	end
 
 	def if_game_in_progress
