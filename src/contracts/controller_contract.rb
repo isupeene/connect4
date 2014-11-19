@@ -11,7 +11,7 @@ module ControllerContract
 	
 	def play_postcondition(column, result)
 		assert_equal(
-			player_number, game.board[-board.number_of_tokens(column), column],
+			player_number, game.board[-game.board.number_of_tokens(column), column],
 			"After placing a token, the game board will be " \
 			"(internally) marked with the player number."
 		)
@@ -19,8 +19,8 @@ module ControllerContract
 	
 	def play_invariant(column)
 		# TODO: We can also assert that no other columns are affected.
-		previous_number_of_tokens = board.number_of_tokens(column)
+		previous_number_of_tokens = game.board.number_of_tokens(column)
 		yield
-		assert_equals(previous_number_of_tokens + 1, board.number_of_tokens(column))
+		assert_equals(previous_number_of_tokens + 1, game.board.number_of_tokens(column))
 	end
 end

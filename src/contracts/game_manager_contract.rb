@@ -3,7 +3,7 @@ require_relative 'controller_contract'
 
 module GameManagerContract
 	def start_game_postcondition(game_options, result)
-		if game_options.single_player?
+		if game_options[:single_player]
 			assert(
 				result.is_a?(ControllerContract),
 				"Starting a new game returns the human player's controller."
