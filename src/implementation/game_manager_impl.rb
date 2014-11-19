@@ -1,7 +1,8 @@
 require_relative 'game_impl' # TODO: no impl
 require_relative 'ai_view_impl'
 require_relative 'connect4_ai_impl'
-require_relative 'cli_connect4_view_impl'
+require_relative 'cli_connect4_single_player_view_impl'
+require_relative 'cli_connect4_multiplayer_view_impl'
 require_relative 'controller_impl'
 require_relative 'victory_conditions'
 
@@ -9,21 +10,51 @@ module GameManagerImpl
 	@@game = nil
 
 	def self.start_game(game_options={})
-		# TODO: For now, we assume CLI, single-player and connect 4.
-		# These can be made part of the game options.
+		if game_options[:single_player]
+			start_single_player_game(game_options)
+		else
+			start_multiplayer_game(game_options)
+		end
+	end
 
+	def self.start_single_player_game(game_options)
 		ai_view = AIViewImpl.new
 		
 		@@game = GameImpl.new(
 			game_options,
 			ai_view,
-			CLIConnect4ViewImpl.new(STDOUT, 1),
-			self
-		) { |b| connect4_victory_condition(b) }
-
+			*get_player_views(game_options),
+			self,
+			&get_victory_condition(game_options)
+		)
 		
 		Connect4AIImpl.new(ai_view, ControllerImpl.new(@@game, 2))
 		return ControllerImpl.new(@@game, 1)
+	end
+
+	def self.start_multiplayer_game(game_options)
+		@@game = GameImpl.new(
+			game_options,
+			*get_player_views(game_options),
+			self,
+			&get_victory_condition(game_options)
+		)
+
+		return [1, 2].map{ |i| ControllerImpl.new(@@game, i) }
+	end
+
+	def self.get_player_views(game_options)
+		# TODO: GUI vs. CLI, Connect4 vs OTTO and TOOT
+		if game_options[:single_player]
+			[CLIConnect4SinglePlayerViewImpl.new(STDOUT, 1)]
+		else
+			[CLIConnect4MultiplayerViewImpl.new(STDOUT)]
+		end
+	end
+
+	def self.get_victory_condition(game_options)
+		# TODO: Connect4 vs OTTO and TOOT
+		Proc.new{ |b| connect4_victory_condition(b) }
 	end
 
 	def self.end_game
