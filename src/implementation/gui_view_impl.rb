@@ -153,8 +153,6 @@ class GUIViewImpl
 				@current_game_type = 1
 			end
 		end
-		puts "Through"
-		puts @current_game_type	
 	end
 	
 	def save_game
