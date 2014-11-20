@@ -37,4 +37,13 @@ module VictoryConditions
 	def self.connect4(board)
 		victory(board) { |a| Set.new(a).size == 1 }
 	end
+
+	def self.otto_and_toot(board)
+		victory(board) { |a|
+			a[0] == a[3] &&
+			a[1] == a[2] &&
+			a[0] != a[1] &&
+			!a.any?{ |x| x.nil? }
+		}
+	end
 end

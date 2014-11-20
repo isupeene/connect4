@@ -1,6 +1,8 @@
 require_relative 'game_manager_impl' # TODO: no impl
 require_relative 'cli_connect4_single_player_view_impl'
 require_relative 'cli_connect4_multiplayer_view_impl'
+require_relative 'cli_otto_and_toot_single_player_view_impl'
+require_relative 'cli_otto_and_toot_multiplayer_view_impl'
 
 class CLIClient
 	def initialize(input_stream=STDIN, output_stream=STDOUT)
@@ -37,15 +39,26 @@ class CLIClient
 		if input_line.include?("-s")
 			options[:single_player] = true
 		end
+		if input_line.include?("-o")
+			options[:otto_and_toot] = true
+		end
 		@out.puts("Starting a new game...")
 		@controllers = GameManagerImpl.start_game(options, get_view(options))
 	end
 
 	def get_view(options)
 		if options[:single_player]
-			CLIConnect4SinglePlayerViewImpl.new(@out, 1)
+			if options[:otto_and_toot]
+				CLIOttoAndTootSinglePlayerViewImpl.new(@out, 1)
+			else
+				CLIConnect4SinglePlayerViewImpl.new(@out, 1)
+			end
 		else
-			CLIConnect4MultiplayerViewImpl.new(@out)
+			if options[:otto_and_toot]
+				CLIOttoAndTootMultiplayerViewImpl.new(@out)
+			else
+				CLIConnect4MultiplayerViewImpl.new(@out)
+			end
 		end
 	end
 

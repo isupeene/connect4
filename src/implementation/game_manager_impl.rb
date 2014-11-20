@@ -26,13 +26,15 @@ module GameManagerImpl
 	end
 
 	def self.get_ai_class(game_options)
-		# TODO: Connect4 vs OTTO and TOOT
-		Connect4AIImpl
+		Connect4AIImpl # lol
 	end
 
 	def self.get_victory_condition(game_options)
-		# TODO: Connect4 vs OTTO and TOOT
-		Proc.new{ |b| VictoryConditions.connect4(b) }
+		if game_options[:otto_and_toot]
+			Proc.new{ |b| VictoryConditions.otto_and_toot(b) }
+		else
+			Proc.new{ |b| VictoryConditions.connect4(b) }
+		end
 	end
 
 	def self.end_game
