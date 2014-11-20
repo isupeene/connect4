@@ -7,10 +7,10 @@
 require_relative "gui_client"
 require_relative "cli_client"
 
-# Due to the nature of the assignment, most of this file will be comments as everything
-# is accessed through clients which are not set to be easily accessed by a ruby file.
-# The CLI client can be run from a ruby file using passed input and output streams
-# but this case is not the intended use case.
+puts "Due to the nature of the assignment, most of this file will be comments as everything" + \
+" is accessed through clients which are not set to be easily accessed by a ruby file."
+puts "The CLI client can be run from a ruby file using passed input and output streams" + \
+" but this case is not the intended use case."
 
 #######
 # GUI #
