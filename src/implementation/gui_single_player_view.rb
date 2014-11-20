@@ -1,4 +1,5 @@
 module GUISinglePlayerView
+	# Callback for Game model to call. Displays turn info.
 	def turn_update(update)
 		if update[:board]
 			print_board(update[:board])
@@ -13,6 +14,7 @@ module GUISinglePlayerView
 		end
 	end
 
+	# Called when game ends. Displays winner info to GUI.
 	def game_over(winner)
 		case winner
 		when 0

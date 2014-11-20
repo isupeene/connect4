@@ -11,7 +11,7 @@ module GUIConnect4View
 		2 => Gdk::Color.parse("#000000") #black
 	}
 	
-		
+	# Update GUI with colors in places where tokens are.
 	def print_board(board)
 		board.each_with_index{ |x,i,j|
 			button = @buttons[i][j]

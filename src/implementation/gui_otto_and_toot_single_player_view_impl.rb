@@ -11,6 +11,7 @@ class GUIOttoAndTootSinglePlayerViewImpl
 		@player_number = player_number
 	end
 
+	# Updates GUI with player specific info each turn.
 	def turn_update(update)
 		super
 

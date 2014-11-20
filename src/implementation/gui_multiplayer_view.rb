@@ -1,4 +1,5 @@
 module GUIMultiplayerView
+	# Callback that game model calls when game changes.
 	def turn_update(update)
 		if update[:board]
 			print_board(update[:board])
@@ -11,6 +12,7 @@ module GUIMultiplayerView
 		end
 	end
 
+	# Changes GUI to display winner when game ends.
 	def game_over(winner)
 		if winner == 0
 			@displays[0].set_label("Tie game!")

@@ -16,6 +16,7 @@ class GUIViewImpl
 		if __FILE__ == $0
 			Gtk.init
 	
+			# Load GUI from a glade file.
 			@builder = Gtk::Builder::new
 			@builder.add_from_file("Connect4.glade")
 			@builder.connect_signals{ |handler| method(handler) } 
@@ -58,8 +59,8 @@ class GUIViewImpl
 			menu_option = @builder.get_object("checkmenuitem" + 1.to_s)
 			menu_option.set_active true
 	      	
+			# Set up signals for button clicks and store the buttons to give to the views.
 			@buttons = Array.new(6){Array.new(7)}
-			# Set up signals for button clicks
 			0.upto(5) { |i|
 				0.upto(6) { |j|
 					@buttons[i][j] = @builder.get_object("buttoni" + i.to_s + "j" +j.to_s)
@@ -67,6 +68,7 @@ class GUIViewImpl
 				}
 			}
 			
+			# Get displays for the client and views to write to.
 			@client_display = @builder.get_object("label1")
 			@view_displays = []
 			2.upto(4) { |i|
@@ -82,6 +84,7 @@ class GUIViewImpl
 		end
 	end
   
+	# Clear board back to its original state, all blank, white buttons
 	def clear_board
 		@buttons.each{ |row|
 			row.each { |button|
@@ -91,19 +94,21 @@ class GUIViewImpl
 		}
 	end
 
-
+	# Set up board based on game options and game type.
+	# Create an appropriate view for the game 
 	def set_up_board(game_options={})
 		clear_board
 		@current_game_type = @next_game_type
 		if @next_game_type == 2
 			game_options[:otto_and_toot] = true
 		end
-		@view = get_view(game_options)
-		@controllers = GameManagerImpl.start_game(game_options, @view)
+		
+		@controllers = GameManagerImpl.start_game(game_options, get_view(game_options))
 		@current_game_type = @next_game_type
 		@client_display.set_label("#{@@game_types[@current_game_type]} game.")
 	end
 	
+	# Returns an appropriate view for the game based on the options.
 	def get_view(options)
 		if options[:single_player]
 			if options[:otto_and_toot]
@@ -120,6 +125,7 @@ class GUIViewImpl
 		end
 	end
 
+	# Validates move and plays the move if it is valid.
 	def button_clicked(column)
 		if !GameManagerImpl.game_in_progress
 			@client_display.set_label("There is no game in progress!")
@@ -132,14 +138,17 @@ class GUIViewImpl
 		end
 	end
 	
+	# Get controller for current turn.
 	def current_controller
 		[*@controllers].select{|c| c.my_turn }[0] if @controllers
 	end
 	
+	# Determine if it is a user's turn
 	def my_turn
 		!current_controller.nil?
 	end
 	
+	# Load game into client
 	def load_game
 		#TODO Load constantly fails
 		if !GameManagerImpl.save_file_present
@@ -155,6 +164,7 @@ class GUIViewImpl
 		end
 	end
 	
+	# Save game to disk
 	def save_game
 		if GameManagerImpl.save_game
 			@client_display.set_label("Game saved successfully.")
@@ -163,10 +173,12 @@ class GUIViewImpl
 		end
 	end
 	
+	# Save game to disk
 	def save_game_as
 		save_game
 	end
 	
+	# Set up next game type to and make sure there is only one game type checked in the GUI
 	def game_type(chosen_type)
 		menu_option = @builder.get_object("checkmenuitem" + chosen_type.to_s)
 		if menu_option.active? && @next_game_type != chosen_type

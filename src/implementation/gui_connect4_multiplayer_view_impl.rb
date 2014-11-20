@@ -10,6 +10,7 @@ class GUIConnect4MultiplayerViewImpl
 		@displays = displays
 	end
 	
+	# Updates GUI with player specific info each turn.
 	def turn_update(update)
 		super
 
