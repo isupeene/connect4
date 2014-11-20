@@ -1,6 +1,6 @@
 require 'thread'
 
-class Connect4AIImpl
+class Connect4AI
 	def initialize(view, controller)
 		@view = view
 		@controller = controller

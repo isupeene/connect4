@@ -1,20 +1,26 @@
-require_relative 'game_manager_impl' # TODO: no impl
-require_relative 'cli_connect4_single_player_view_impl'
-require_relative 'cli_connect4_multiplayer_view_impl'
-require_relative 'cli_otto_and_toot_single_player_view_impl'
-require_relative 'cli_otto_and_toot_multiplayer_view_impl'
+require_relative 'game_manager' 
+require_relative 'cli_connect4_single_player_view'
+require_relative 'cli_connect4_multiplayer_view'
+require_relative 'cli_otto_and_toot_single_player_view'
+require_relative 'cli_otto_and_toot_multiplayer_view'
 
 class CLIClient
 	def initialize(input_stream=STDIN, output_stream=STDOUT)
 		@in = input_stream
 		@out = output_stream
 		@controllers = nil
+		@game_manager = GameManager.new
 
 		@out.puts("Welcome to connect4!")
 
 		loop {
-			input_line = @in.gets.strip.split
-			command = input_line.shift.strip
+			input = @in.gets.strip
+			if input == ""
+				command = ""
+			else
+				input_line = input.split
+				command = input_line.shift.strip
+			end
 
 			if command.to_i.to_s == command
 				if_game_in_progress{ place_token(command.to_i) }
@@ -43,31 +49,31 @@ class CLIClient
 			options[:otto_and_toot] = true
 		end
 		@out.puts("Starting a new game...")
-		@controllers = GameManagerImpl.start_game(options, get_view(options))
+		@controllers = @game_manager.start_game(options, get_view(options))
 	end
 
 	def get_view(options)
 		if options[:single_player]
 			if options[:otto_and_toot]
-				CLIOttoAndTootSinglePlayerViewImpl.new(@out, 1)
+				CLIOttoAndTootSinglePlayerView.new(@out, 1)
 			else
-				CLIConnect4SinglePlayerViewImpl.new(@out, 1)
+				CLIConnect4SinglePlayerView.new(@out, 1)
 			end
 		else
 			if options[:otto_and_toot]
-				CLIOttoAndTootMultiplayerViewImpl.new(@out)
+				CLIOttoAndTootMultiplayerView.new(@out)
 			else
-				CLIConnect4MultiplayerViewImpl.new(@out)
+				CLIConnect4MultiplayerView.new(@out)
 			end
 		end
 	end
 
 	def end_game
-		GameManagerImpl.end_game
+		@game_manager.end_game
 	end
 
 	def save_game
-		if GameManagerImpl.save_game
+		if @game_manager.save_game
 			@out.puts("Saved!")
 		else
 			@out.puts("An error occurred while saving.")
@@ -75,18 +81,18 @@ class CLIClient
 	end
 
 	def load_game
-		if !GameManagerImpl.save_file_present
+		if !@game_manager.save_file_present
 			@out.puts("No save file is available to load.")
-		elsif !@controllers = GameManagerImpl.load_game
+		elsif !@controllers = @game_manager.load_game
 			@out.puts("An error occurred while loading.")
 		else
-			options = GameManagerImpl.get_options
-			GameManagerImpl.add_view(get_view(options))
+			options = @game_manager.get_options
+			@game_manager.add_view(get_view(options))
 		end
 	end
 
 	def if_game_in_progress
-		if GameManagerImpl.game_in_progress
+		if @game_manager.game_in_progress
 			yield
 		else
 			@out.puts("There's currently no game in progress!")
@@ -99,7 +105,7 @@ class CLIClient
 	end
 
 	def place_token(column)
-		if !GameManagerImpl.game_in_progress
+		if !@game_manager.game_in_progress
 			@out.puts("There is no current game in progress!")
 		elsif !my_turn
 			@out.puts("It's not your turn!")
