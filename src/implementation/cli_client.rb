@@ -1,4 +1,8 @@
 require_relative 'game_manager_impl' # TODO: no impl
+require_relative 'cli_connect4_single_player_view_impl'
+require_relative 'cli_connect4_multiplayer_view_impl'
+require_relative 'cli_otto_and_toot_single_player_view_impl'
+require_relative 'cli_otto_and_toot_multiplayer_view_impl'
 
 class CLIClient
 	def initialize(input_stream=STDIN, output_stream=STDOUT)
@@ -9,13 +13,13 @@ class CLIClient
 		@out.puts("Welcome to connect4!")
 
 		loop {
-			command = @in.gets.strip
+			input_line = @in.gets.strip.split
+			command = input_line.shift.strip
+
 			if command.to_i.to_s == command
 				if_game_in_progress{ place_token(command.to_i) }
 			elsif command == "start"
-				start_game
-			elsif command == "start-solo"
-				start_game({:single_player => true})
+				start_game(input_line)
 			elsif command == "save"
 				save_game
 			elsif command == "load"
@@ -30,9 +34,32 @@ class CLIClient
 		}
 	end
 
-	def start_game(options={})
+	def start_game(input_line)
+		options = {}
+		if input_line.include?("-s")
+			options[:single_player] = true
+		end
+		if input_line.include?("-o")
+			options[:otto_and_toot] = true
+		end
 		@out.puts("Starting a new game...")
-		@controllers = GameManagerImpl.start_game(options)
+		@controllers = GameManagerImpl.start_game(options, get_view(options))
+	end
+
+	def get_view(options)
+		if options[:single_player]
+			if options[:otto_and_toot]
+				CLIOttoAndTootSinglePlayerViewImpl.new(@out, 1)
+			else
+				CLIConnect4SinglePlayerViewImpl.new(@out, 1)
+			end
+		else
+			if options[:otto_and_toot]
+				CLIOttoAndTootMultiplayerViewImpl.new(@out)
+			else
+				CLIConnect4MultiplayerViewImpl.new(@out)
+			end
+		end
 	end
 
 	def end_game

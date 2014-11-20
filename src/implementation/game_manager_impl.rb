@@ -1,60 +1,40 @@
 require_relative 'game_impl' # TODO: no impl
 require_relative 'ai_view_impl'
 require_relative 'connect4_ai_impl'
-require_relative 'cli_connect4_single_player_view_impl'
-require_relative 'cli_connect4_multiplayer_view_impl'
 require_relative 'controller_impl'
 require_relative 'victory_conditions'
 
 module GameManagerImpl
 	@@game = nil
 
-	def self.start_game(game_options={})
-		if game_options[:single_player]
-			start_single_player_game(game_options)
-		else
-			start_multiplayer_game(game_options)
-		end
-	end
+	def self.start_game(game_options={}, *views)
+		views << AIViewImpl.new if game_options[:single_player]
 
-	def self.start_single_player_game(game_options)
-		ai_view = AIViewImpl.new
-		
 		@@game = GameImpl.new(
 			game_options,
-			ai_view,
-			*get_player_views(game_options),
-			self,
-			&get_victory_condition(game_options)
-		)
-		
-		Connect4AIImpl.new(ai_view, ControllerImpl.new(@@game, 2))
-		return ControllerImpl.new(@@game, 1)
-	end
-
-	def self.start_multiplayer_game(game_options)
-		@@game = GameImpl.new(
-			game_options,
-			*get_player_views(game_options),
+			*views,
 			self,
 			&get_victory_condition(game_options)
 		)
 
-		return [1, 2].map{ |i| ControllerImpl.new(@@game, i) }
+		if game_options[:single_player]
+			get_ai_class(game_options).new(views[-1], ControllerImpl.new(@@game, 2))
+			return ControllerImpl.new(@@game, 1)
+		else
+			return [1, 2].map{ |i| ControllerImpl.new(@@game, i) }
+		end
 	end
 
-	def self.get_player_views(game_options)
-		# TODO: GUI vs. CLI, Connect4 vs OTTO and TOOT
-		if game_options[:single_player]
-			[CLIConnect4SinglePlayerViewImpl.new(STDOUT, 1)]
-		else
-			[CLIConnect4MultiplayerViewImpl.new(STDOUT)]
-		end
+	def self.get_ai_class(game_options)
+		Connect4AIImpl # lol
 	end
 
 	def self.get_victory_condition(game_options)
-		# TODO: Connect4 vs OTTO and TOOT
-		Proc.new{ |b| connect4_victory_condition(b) }
+		if game_options[:otto_and_toot]
+			Proc.new{ |b| VictoryConditions.otto_and_toot(b) }
+		else
+			Proc.new{ |b| VictoryConditions.connect4(b) }
+		end
 	end
 
 	def self.end_game
