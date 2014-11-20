@@ -32,7 +32,7 @@ module GameManagerImpl
 
 	def self.get_victory_condition(game_options)
 		# TODO: Connect4 vs OTTO and TOOT
-		Proc.new{ |b| connect4_victory_condition(b) }
+		Proc.new{ |b| VictoryConditions.connect4(b) }
 	end
 
 	def self.end_game
