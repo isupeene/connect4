@@ -61,6 +61,11 @@ require_relative "cli_client"
 # Both options are optional. -s will make a single player game.
 # -o will make an otto and toot game instead of connect 4.
 
+# PLACING A TOKEN
+# Once a game is started, place a token by typing a zero-based column number (0-6).
+# > 0
+# places a token in the left-most column.
+
 # SAVING A GAME
 # Save the current game with:
 # > save
