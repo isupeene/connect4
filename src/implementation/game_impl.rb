@@ -49,6 +49,12 @@ class GameImpl
 		end
 		end
 	end
+	
+	def add_view(view)
+		@views << view
+		update_views({:board => @board, :current_turn => @current_turn})
+	end
+	
 
 	def play(column, player_number)
 		# Increment player number first, to avoid a race

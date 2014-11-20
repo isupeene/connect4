@@ -150,17 +150,21 @@ class GUIClient
 	
 	# Load game into client
 	def load_game
-		#TODO Load constantly fails
 		if !GameManagerImpl.save_file_present
 			@client_display.set_label("There is no game file to load.")
 		elsif !@controllers = GameManagerImpl.load_game
 			@client_display.set_label("An error occurred while loading.")
 		else
-			if [*@controllers][0].game.options[:otto_and_toot]
+			clear_board
+			options = GameManagerImpl.get_options
+			
+			if options[:otto_and_toot]
 				@current_game_type = 2
 			else
 				@current_game_type = 1
 			end
+			GameManagerImpl.add_view(get_view(options))
+			@client_display.set_label("#{@@game_types[@current_game_type]} game.")
 		end
 	end
 	

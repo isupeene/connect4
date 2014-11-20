@@ -36,6 +36,14 @@ module GameManagerImpl
 			Proc.new{ |b| VictoryConditions.connect4(b) }
 		end
 	end
+	
+	def self.get_options
+		@@game.options
+	end
+	
+	def self.add_view(view)
+		@@game.add_view(view)
+	end
 
 	def self.end_game
 		@@game.quit
