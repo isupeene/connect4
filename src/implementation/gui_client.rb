@@ -7,7 +7,7 @@ require_relative 'gui_connect4_multiplayer_view_impl'
 require_relative 'gui_otto_and_toot_single_player_view_impl'
 require_relative 'gui_otto_and_toot_multiplayer_view_impl'
 
-class GUIViewImpl
+class GUIClient
 
 	@@white = Gdk::Color.parse("#FFFFFF")
 	@@game_types = {1 => "Connect 4", 2 => "Otto and Toot"}
@@ -194,5 +194,4 @@ class GUIViewImpl
 	
 end
 
-
-GUIViewImpl.new
+GUIClient.new
