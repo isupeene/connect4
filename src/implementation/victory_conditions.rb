@@ -21,7 +21,7 @@ module VictoryConditions
 					col = j + m*q
 					# Handle edges of board
 					if row >= 0 && row < board.height && col >= 0 && col < board.width
-						board[i + m*p, j + m*q]
+						board[row, col]
 					else
 						nil
 					end
