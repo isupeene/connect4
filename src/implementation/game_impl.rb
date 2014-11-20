@@ -29,10 +29,6 @@ class GameImpl
 			end
 
 			board.add_token(command[:token], command[:column])
-			update_views({
-				:board => board,
-				:current_turn => @current_turn
-			})
 
 			winner = @victory_condition.call(board)
 			if winner
@@ -42,6 +38,11 @@ class GameImpl
 					:winner => winner
 				})
 				return
+			else
+				update_views({
+					:board => board,
+					:current_turn => @current_turn
+				})
 			end
 		rescue Exception => ex
 			puts ex
