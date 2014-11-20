@@ -1,14 +1,12 @@
 
 require 'gtk2'
-#TODO No impl
-require_relative "game_manager_impl"
-require_relative 'gui_connect4_single_player_view_impl'
-require_relative 'gui_connect4_multiplayer_view_impl'
-require_relative 'gui_otto_and_toot_single_player_view_impl'
-require_relative 'gui_otto_and_toot_multiplayer_view_impl'
+require_relative "game_manager"
+require_relative 'gui_connect4_single_player_view'
+require_relative 'gui_connect4_multiplayer_view'
+require_relative 'gui_otto_and_toot_single_player_view'
+require_relative 'gui_otto_and_toot_multiplayer_view'
 
 class GUIClient
-
 	@@white = Gdk::Color.parse("#FFFFFF")
 	@@game_types = {1 => "Connect 4", 2 => "Otto and Toot"}
 
@@ -18,7 +16,7 @@ class GUIClient
 	
 			# Load GUI from a glade file.
 			@builder = Gtk::Builder::new
-			@builder.add_from_file("Connect4.glade")
+			@builder.add_from_file("implementation/Connect4.glade")
 			@builder.connect_signals{ |handler| method(handler) } 
 	
 			# Quit Gtk when window closed.
@@ -75,6 +73,7 @@ class GUIClient
 				@view_displays << @builder.get_object("label" + i.to_s)
 			}
 			@controllers = nil
+			@game_manager = GameManager.new
 			
 			set_up_board
 	
@@ -103,7 +102,7 @@ class GUIClient
 			game_options[:otto_and_toot] = true
 		end
 		
-		@controllers = GameManagerImpl.start_game(game_options, get_view(game_options))
+		@controllers = @game_manager.start_game(game_options, get_view(game_options))
 		@current_game_type = @next_game_type
 		@client_display.set_label("#{@@game_types[@current_game_type]} game.")
 	end
@@ -112,22 +111,22 @@ class GUIClient
 	def get_view(options)
 		if options[:single_player]
 			if options[:otto_and_toot]
-				GUIOttoAndTootSinglePlayerViewImpl.new(@buttons, @view_displays, 1)
+				GUIOttoAndTootSinglePlayerView.new(@buttons, @view_displays, 1)
 			else
-				GUIConnect4SinglePlayerViewImpl.new(@buttons, @view_displays, 1)
+				GUIConnect4SinglePlayerView.new(@buttons, @view_displays, 1)
 			end
 		else
 			if options[:otto_and_toot]
-				GUIOttoAndTootMultiplayerViewImpl.new(@buttons, @view_displays)
+				GUIOttoAndTootMultiplayerView.new(@buttons, @view_displays)
 			else
-				GUIConnect4MultiplayerViewImpl.new(@buttons, @view_displays)
+				GUIConnect4MultiplayerView.new(@buttons, @view_displays)
 			end
 		end
 	end
 
 	# Validates move and plays the move if it is valid.
 	def button_clicked(column)
-		if !GameManagerImpl.game_in_progress
+		if !@game_manager.game_in_progress
 			@client_display.set_label("There is no game in progress!")
 		elsif !my_turn
 			@client_display.set_label("It's not your turn!")
@@ -150,27 +149,27 @@ class GUIClient
 	
 	# Load game into client
 	def load_game
-		if !GameManagerImpl.save_file_present
+		if !@game_manager.save_file_present
 			@client_display.set_label("There is no game file to load.")
-		elsif !@controllers = GameManagerImpl.load_game
+		elsif !@controllers = @game_manager.load_game
 			@client_display.set_label("An error occurred while loading.")
 		else
 			clear_board
-			options = GameManagerImpl.get_options
+			options = @game_manager.get_options
 			
 			if options[:otto_and_toot]
 				@current_game_type = 2
 			else
 				@current_game_type = 1
 			end
-			GameManagerImpl.add_view(get_view(options))
+			@game_manager.add_view(get_view(options))
 			@client_display.set_label("#{@@game_types[@current_game_type]} game.")
 		end
 	end
 	
 	# Save game to disk
 	def save_game
-		if GameManagerImpl.save_game
+		if @game_manager.save_game
 			@client_display.set_label("Game saved successfully.")
 		else
 			@client_display.set_label("Error occurred while saving.")

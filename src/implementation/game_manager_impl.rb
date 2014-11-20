@@ -1,16 +1,18 @@
-require_relative 'game_impl' # TODO: no impl
-require_relative 'ai_view_impl'
-require_relative 'connect4_ai_impl'
-require_relative 'controller_impl'
+gem "test-unit"
+require 'test/unit'
+require_relative '../game'
+require_relative '../ai_view'
+require_relative 'connect4_ai'
+require_relative '../controller'
 require_relative 'victory_conditions'
 
-module GameManagerImpl
-	@@game = nil
+class GameManagerImpl
+	@game = nil
 
-	def self.start_game(game_options={}, *views)
-		views << AIViewImpl.new if game_options[:single_player]
+	def start_game(game_options={}, *views)
+		views << AIView.new if game_options[:single_player]
 
-		@@game = GameImpl.new(
+		@game = Game.new(
 			game_options,
 			*views,
 			self,
@@ -18,18 +20,18 @@ module GameManagerImpl
 		)
 
 		if game_options[:single_player]
-			get_ai_class(game_options).new(views[-1], ControllerImpl.new(@@game, 2))
-			return ControllerImpl.new(@@game, 1)
+			get_ai_class(game_options).new(views[-1], Controller.new(@game, 2))
+			return Controller.new(@game, 1)
 		else
-			return [1, 2].map{ |i| ControllerImpl.new(@@game, i) }
+			return [1, 2].map{ |i| Controller.new(@game, i) }
 		end
 	end
 
-	def self.get_ai_class(game_options)
-		Connect4AIImpl # lol
+	def get_ai_class(game_options)
+		Connect4AI # lol
 	end
 
-	def self.get_victory_condition(game_options)
+	def get_victory_condition(game_options)
 		if game_options[:otto_and_toot]
 			Proc.new{ |b| VictoryConditions.otto_and_toot(b) }
 		else
@@ -37,23 +39,23 @@ module GameManagerImpl
 		end
 	end
 	
-	def self.get_options
-		@@game.options
+	def get_options
+		@game.options
 	end
 	
-	def self.add_view(view)
-		@@game.add_view(view)
+	def add_view(view)
+		@game.add_view(view)
 	end
 
-	def self.end_game
-		@@game.quit
-		@@game = nil
+	def end_game
+		@game.quit
+		@game = nil
 	end
 
-	def self.save_game
+	def save_game
 		begin
 			File.open("connect4.sav", "w") { |savefile|
-				savefile.write(@@game.save)
+				savefile.write(@game.save)
 			}
 			return true
 		rescue Exception => ex
@@ -62,7 +64,7 @@ module GameManagerImpl
 		end
 	end
 
-	def self.load_game
+	def load_game
 		begin
 			options = nil
 			File.open("connect4.sav", "r") { |savefile|
@@ -78,15 +80,15 @@ module GameManagerImpl
 		end
 	end
 
-	def self.game_in_progress
-		!@@game.nil?
+	def game_in_progress
+		!@game.nil?
 	end
 
-	def self.save_file_present
+	def save_file_present
 		File.file?("connect4.sav")
 	end
 
-	def self.turn_update(update)
-		@@game = nil if update[:game_over]
+	def turn_update(update)
+		@game = nil if update[:game_over]
 	end
 end

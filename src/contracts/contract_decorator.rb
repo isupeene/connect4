@@ -1,3 +1,5 @@
+gem "test-unit"
+require 'test/unit'
 require_relative 'contract_symbols'
 
 # The built-in triple-equals is below the level of ruby 'is_a?'
@@ -9,53 +11,86 @@ class Module
 	end
 end
 
-# This module decorates our modules with contracts
-module ModuleContractDecorator
+# This module decorates our classes with contracts
+module ClassContractDecorator
 	include ContractSymbols
+
+	# Initiliaze with the implementation to decorate
+	def initialize_impl(implementation)
+		@implementation = implementation
+	end
+
+	# Initiliaze with the implementation to decorate
+	def initialize(implementation)
+		initialize_impl(implementation)
+	end
+
+	# Initiliaze a deep copy of another Decorator
+	def initialize_clone(other)
+		initialize_impl(other.implementation.clone)
+	end
+
+	# Initiliaze a shallow copy of another Decorator
+	def initialize_dup(other)
+		initialize_impl(other.implementation.dup)
+	end
+
+	protected
+	attr_accessor :implementation
 
 	# Set contracts to be run or not. Default is true
 	public
 	def self.enable_contracts(bool)
 		@@enable_contracts = bool
 	end
-
+	
 	# See if contracts are set to run
 	def self.enable_contracts?
 		@@enable_contracts
 	end
-
+	
 	@@enable_contracts = true
 
 	# Boolean determines if contracts are currently being run
 	@@evaluating_contracts = false
 
+	# Check if other decorator is equal to this one
+	def ==(other)
+		@implementation == other
+	end
+
+	# Set decorator class to be equal to implementations
+	def class
+		@implementation.class
+	end
+
 	# Execute the class invariant if there is one
 	def try_execute_class_invariant
-		if implementation.respond_to?(:invariant)
-			implementation.invariant
+		if @implementation.respond_to?(:invariant)
+			@implementation.invariant
 		end
 	end
 
 	# Execute the method precondition if there is one
 	def try_execute_precondition(symbol, *args, &block)
-		if implementation.respond_to?(precondition_name(symbol))
-			implementation.send(precondition_name(symbol), *args, &block)
-		end
+		if @implementation.respond_to?(precondition_name(symbol))
+			@implementation.send(precondition_name(symbol), *args, &block)
+		end 
 	end
 
 	# Execute the method invariant if there is one, otherwise just call the function
 	def try_execute_method_invariant(symbol, *args, &block)
-		if implementation.respond_to?(invariant_name(symbol))
+		if @implementation.respond_to?(invariant_name(symbol))
 			result = nil
-			implementation.send(invariant_name(symbol), *args) {
+			@implementation.send(invariant_name(symbol), *args) {
 				@@evaluating_contracts = false
-				result = implementation.send(symbol, *args, &block)
+				result = @implementation.send(symbol, *args, &block)
 				@@evaluating_contracts = true
 			}
 			return result
 		else
 			@@evaluating_contracts = false
-			result = implementation.send(symbol, *args, &block)
+			result = @implementation.send(symbol, *args, &block)
 			@@evaluating_contracts = true
 			return result
 		end
@@ -63,8 +98,8 @@ module ModuleContractDecorator
 
 	# Execute the method postcondition if there is one
 	def try_execute_postcondition(symbol, *args, &block)
-		if implementation.respond_to?(postcondition_name(symbol))
-			implementation.send(postcondition_name(symbol), *args, &block)
+		if @implementation.respond_to?(postcondition_name(symbol))
+			@implementation.send(postcondition_name(symbol), *args, &block)
 		end
 	end
 
@@ -74,9 +109,7 @@ module ModuleContractDecorator
 	# contracts are enabled and contracts are not currently being evaluated. If contracts
 	# are not enabled or contracts are already being evaluated then the method will just
 	# be called without contracts.
-	# Only attempts to call method if it exists in the implementation code.
 	def method_missing(symbol, *args, &block)
-		super unless implementation.respond_to?(symbol)
 		if @@enable_contracts && !@@evaluating_contracts
 			begin
 				@@evaluating_contracts = true
@@ -86,7 +119,7 @@ module ModuleContractDecorator
 
 				result = try_execute_method_invariant(symbol, *args, &block)
 
-				try_execute_postcondition(symbol, *args.unshift(result), &block)
+				try_execute_postcondition(symbol, *args << result, &block)
 				try_execute_class_invariant
 
 				return result
@@ -94,8 +127,7 @@ module ModuleContractDecorator
 				@@evaluating_contracts = false
 			end
 		else
-			implementation.send(symbol, *args, &block)
+			@implementation.send(symbol, *args, &block)
 		end
 	end
 end
-

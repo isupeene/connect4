@@ -1,3 +1,5 @@
+gem "test-unit"
+
 require 'test/unit'
 
 module ControllerContract
