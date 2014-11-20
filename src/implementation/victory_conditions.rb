@@ -15,7 +15,17 @@ module VictoryConditions
 			next if x.nil?
 
 			ALL_DIRECTIONS.each { |p, q|
-				if yield (0..3).map{ |m| board[i + m*p, j + m*q] }
+				# Add winner if victory condition is met.
+				if yield (0..3).map{ |m| 
+					row = i + m*p
+					col = j + m*q
+					# Handle edges of board
+					if row >= 0 && row < board.height && col >= 0 && col < board.width
+						board[row, col]
+					else
+						nil
+					end
+				}
 					winners.add(x)
 				end
 			}

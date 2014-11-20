@@ -79,6 +79,9 @@ class CLIClient
 			@out.puts("No save file is available to load.")
 		elsif !@controllers = GameManagerImpl.load_game
 			@out.puts("An error occurred while loading.")
+		else
+			options = GameManagerImpl.get_options
+			GameManagerImpl.add_view(get_view(options))
 		end
 	end
 
