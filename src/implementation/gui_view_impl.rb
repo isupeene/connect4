@@ -11,14 +11,13 @@ class GUIViewImpl
 
 	@@white = Gdk::Color.parse("#FFFFFF")
 	@@game_types = {1 => "Connect 4", 2 => "Otto and Toot"}
-	@buttons = Array.new(6){Array.new(7)}
 
 	def initialize
 		if __FILE__ == $0
 			Gtk.init
 	
 			@builder = Gtk::Builder::new
-			@builder.add_from_file("Connect4_new.glade")
+			@builder.add_from_file("Connect4.glade")
 			@builder.connect_signals{ |handler| method(handler) } 
 	
 			# Quit Gtk when window closed.
@@ -59,6 +58,7 @@ class GUIViewImpl
 			menu_option = @builder.get_object("checkmenuitem" + 1.to_s)
 			menu_option.set_active true
 	      	
+			@buttons = Array.new(6){Array.new(7)}
 			# Set up signals for button clicks
 			0.upto(5) { |i|
 				0.upto(6) { |j|
@@ -66,6 +66,7 @@ class GUIViewImpl
 					@buttons[i][j].signal_connect("clicked"){button_clicked(j)}
 				}
 			}
+			
 			@client_display = @builder.get_object("label1")
 			@view_displays = []
 			2.upto(4) { |i|
@@ -82,9 +83,11 @@ class GUIViewImpl
 	end
   
 	def clear_board
-		@buttons.each{ |button|
-			button.set_label("")
-			button.modify_bg(Gtk::STATE_NORMAL, @@white)
+		@buttons.each{ |row|
+			row.each { |button|
+				button.set_label("")
+				button.modify_bg(Gtk::STATE_NORMAL, @@white)
+			}
 		}
 	end
 
@@ -144,12 +147,14 @@ class GUIViewImpl
 		elsif !@controllers = GameManagerImpl.load_game
 			@client_display.set_label("An error occurred while loading.")
 		else
-			if @controllers[0].game.options[:otto_and_toot]
+			if [*@controllers][0].game.options[:otto_and_toot]
 				@current_game_type = 2
 			else
 				@current_game_type = 1
 			end
-		end	
+		end
+		puts "Through"
+		puts @current_game_type	
 	end
 	
 	def save_game
