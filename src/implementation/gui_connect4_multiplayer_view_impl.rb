@@ -1,6 +1,8 @@
 require_relative 'gui_connect4_view'
 require_relative 'gui_multiplayer_view'
 
+# View for an connect 4 multiplayer GUI game. Most functionality provided through
+# the included modules.
 class GUIConnect4MultiplayerViewImpl
 	include GUIConnect4View
 	include GUIMultiplayerView
@@ -10,7 +12,8 @@ class GUIConnect4MultiplayerViewImpl
 		@displays = displays
 	end
 	
-	# Updates GUI with player specific info each turn.
+	# Tell user what token they are playing and what they are trying to do. Then update
+	# the board using super to call the modules to update the board.
 	def turn_update(update)
 		super
 

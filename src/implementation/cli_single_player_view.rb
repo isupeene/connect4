@@ -1,4 +1,9 @@
+# Defines how to update board and report actions to user for a single player
+# game in the command line.
 module CLISinglePlayerView
+	# Callback that model calls. Specific classes override this method
+	# to print specific messages and must then call super for proper
+	# functionality.
 	def turn_update(update)
 		if update[:board]
 			print_board(update[:board])
@@ -13,6 +18,7 @@ module CLISinglePlayerView
 		end
 	end
 
+	# Displays end game messages.
 	def game_over(winner)
 		case winner
 		when 0

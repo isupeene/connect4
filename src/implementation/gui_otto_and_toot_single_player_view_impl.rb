@@ -1,6 +1,8 @@
 require_relative 'gui_single_player_view'
 require_relative 'gui_otto_and_toot_view'
 
+# View for an otto and toot single player GUI game. Most functionality provided through
+# the included modules.
 class GUIOttoAndTootSinglePlayerViewImpl
 	include GUISinglePlayerView
 	include GUIOttoAndTootView
@@ -11,7 +13,8 @@ class GUIOttoAndTootSinglePlayerViewImpl
 		@player_number = player_number
 	end
 
-	# Updates GUI with player specific info each turn.
+	# Tell user what token they are playing and what they are trying to do. Then update
+	# the board using super to call the modules to update the board.
 	def turn_update(update)
 		super
 

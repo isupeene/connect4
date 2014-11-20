@@ -6,6 +6,7 @@ require_relative 'gui_connect4_multiplayer_view'
 require_relative 'gui_otto_and_toot_single_player_view'
 require_relative 'gui_otto_and_toot_multiplayer_view'
 
+# Client to play connect 4 or otto and toot through a graphical user interface.
 class GUIClient
 	@@white = Gdk::Color.parse("#FFFFFF")
 	@@game_types = {1 => "Connect 4", 2 => "Otto and Toot"}

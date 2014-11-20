@@ -1,4 +1,9 @@
+# Defines how to update board and report actions to user for a multiplayer
+# game in the command line.
 module CLIMultiplayerView
+	# Callback that model calls. Specific classes override this method
+	# to print specific messages and must then call super for proper
+	# functionality.
 	def turn_update(update)
 		if update[:board]
 			print_board(update[:board])
@@ -11,6 +16,7 @@ module CLIMultiplayerView
 		end
 	end
 
+	# Displays end game messages.
 	def game_over(winner)
 		if winner == 0
 			@out.puts("Tie game!")

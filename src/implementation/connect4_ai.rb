@@ -1,6 +1,8 @@
 require 'thread'
 
+# AI player that plays randomly.
 class Connect4AI
+	# Create new AI player connected to given view and controller.
 	def initialize(view, controller)
 		@view = view
 		@controller = controller
@@ -9,6 +11,8 @@ class Connect4AI
 		main.priority = 2
 	end
 
+	# Loop that plays until game over. Plays on its turn via updates from
+	# the view.
 	def main_loop
 		loop {
 			update = @view.updates.pop

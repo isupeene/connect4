@@ -1,7 +1,10 @@
 require 'thread'
 require_relative 'game_board'
 
+# Model class that contains all information relative to a game.
 class GameImpl
+	# Make new game based on given options, views that need to be updated
+	# and victory condition.
 	def initialize(options, *views, &victory_condition)
 		@options = options
 		@views = views
@@ -19,6 +22,8 @@ class GameImpl
 	attr_reader :options
 	attr_reader :board
 
+	# Loop that handles commands from controllers via a queue and then updates the board and
+	# the views after each command is processed.
 	def main_loop
 		loop do
 		begin
@@ -50,12 +55,13 @@ class GameImpl
 		end
 	end
 	
+	# Add another view to be updated to the game
 	def add_view(view)
 		@views << view
 		update_views({:board => @board, :current_turn => @current_turn})
 	end
 	
-
+	# Place a token equal to the player number in the column of the board.
 	def play(column, player_number)
 		# Increment player number first, to avoid a race
 		# condition when the AI player gets the update.
@@ -63,20 +69,24 @@ class GameImpl
 		@commands.push({:token => player_number, :column => column})
 	end
 
+	# Ends game and notifies views of this.
 	def quit
 		@commands.push({:cancel => true})
 	end
 
+	# Determines if a move to play a token is valid.
 	def valid_move(column)
 		column >= 0 &&
 		column < board.width &&
 		board.number_of_tokens(column) < board.height
 	end
 
+	# Update all listening views.
 	def update_views(update)
 		@views.each{ |v| v.turn_update(update) }
 	end
 
+	# Save game state.
 	def save
 		@options.merge({
 			:board => board.to_s,

@@ -1,10 +1,13 @@
+# Define how to update the GUI for an otto and toot game.
 module GUIOttoAndTootView
+	# Map player numbers to tokens.
 	TOKEN_MAP = {
 		nil => '',
 		1 => 'O',
 		2 => 'T'
 	}
 
+	# Map player numbers to victory conditions.
 	VICTORY_MAP = {
 		1 => "OTTO",
 		2 => "TOOT"

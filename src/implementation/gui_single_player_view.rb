@@ -1,5 +1,6 @@
 module GUISinglePlayerView
-	# Callback for Game model to call. Displays turn info.
+	# Callback that game model calls when game changes. Updates GUI
+	# board and message.
 	def turn_update(update)
 		if update[:board]
 			print_board(update[:board])
