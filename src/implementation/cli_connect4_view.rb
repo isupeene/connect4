@@ -1,3 +1,4 @@
+# Defines how to draw a connect4 board in the command line.
 module CLIConnect4View
 	def print_board(board)
 		@out.puts(board.rows.map { |r| 

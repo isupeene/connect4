@@ -1,3 +1,4 @@
+# Representation of a game board.
 class GameBoard
 	include Enumerable
 
@@ -14,18 +15,22 @@ class GameBoard
 		6
 	end
 
+	# Set token in board
 	def []=(i, j, x)
 		@board[j][i] = x
 	end
 
+	# Get token from board.
 	def [](i, j)
 		(@board[j] || [])[i]
 	end
 
+	# Return number of non-nil tokens in the given column of the board.
 	def number_of_tokens(column)
 		@board[column].count{ |x| x }
 	end
 
+	# Add token to lowest empty spot in given column.
 	def add_token(token, column)
 		self[-1 - number_of_tokens(column), column] = token
 	end
@@ -56,6 +61,7 @@ class GameBoard
 
 	attr_accessor :board
 
+	# Load board from string.
 	public
 	def self.load(str)
 		result = new

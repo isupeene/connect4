@@ -1,10 +1,13 @@
+# Define how to update GUI for connect 4 game
 module GUIConnect4View
+	# Map player number to tokens.
 	TOKEN_MAP = {
 		nil => 0,
 		1 => 'Red',
 		2 => 'Black'
 	}
 	
+	# Map player number to color to render.
 	COLOR_MAP = {
 		nil => Gdk::Color.parse("#FFFFFF"), #white
 		1 => Gdk::Color.parse("#FF0000"), #red

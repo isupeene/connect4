@@ -4,7 +4,10 @@ require_relative 'cli_connect4_multiplayer_view'
 require_relative 'cli_otto_and_toot_single_player_view'
 require_relative 'cli_otto_and_toot_multiplayer_view'
 
+# Command line interface client to play connect 4 and otto and toot.
+# Can be run by requiring this file and then creating a new instance.
 class CLIClient
+	# Initialize client with input and output streams.
 	def initialize(input_stream=STDIN, output_stream=STDOUT)
 		@in = input_stream
 		@out = output_stream
@@ -13,6 +16,7 @@ class CLIClient
 
 		@out.puts("Welcome to connect4!")
 
+		# Loop to get user input. valid commands are the words below and numbers
 		loop {
 			input = @in.gets.strip
 			if input == ""
@@ -40,6 +44,8 @@ class CLIClient
 		}
 	end
 
+	# Start a new game based on the start command. -s means single player
+	# and -o means otto_and_toot
 	def start_game(input_line)
 		options = {}
 		if input_line.include?("-s")
@@ -52,6 +58,7 @@ class CLIClient
 		@controllers = @game_manager.start_game(options, get_view(options))
 	end
 
+	# Generate an appropriate view based on the options.
 	def get_view(options)
 		if options[:single_player]
 			if options[:otto_and_toot]
@@ -68,10 +75,12 @@ class CLIClient
 		end
 	end
 
+	# End current game.
 	def end_game
 		@game_manager.end_game
 	end
 
+	# Save current game.
 	def save_game
 		if @game_manager.save_game
 			@out.puts("Saved!")
@@ -80,6 +89,7 @@ class CLIClient
 		end
 	end
 
+	# Load saved game if there is one.
 	def load_game
 		if !@game_manager.save_file_present
 			@out.puts("No save file is available to load.")
@@ -91,6 +101,7 @@ class CLIClient
 		end
 	end
 
+	# Perform block if a game is in progress.
 	def if_game_in_progress
 		if @game_manager.game_in_progress
 			yield
@@ -99,11 +110,13 @@ class CLIClient
 		end
 	end
 
+	# Exit the client.
 	def exit_program
 		@out.puts("See you again! Hah hah hah hah hah hah!")
 		exit
 	end
 
+	# Place a token in the column if valid. Otherwise provide error message.
 	def place_token(column)
 		if !@game_manager.game_in_progress
 			@out.puts("There is no current game in progress!")
@@ -116,10 +129,12 @@ class CLIClient
 		end
 	end
 
+	# Get controller for player who's turn it is currently.
 	def current_controller
 		[*@controllers].select{|c| c.my_turn }[0] if @controllers
 	end
 
+	# Determine if it is the client's turn to play.
 	def my_turn
 		!current_controller.nil?
 	end

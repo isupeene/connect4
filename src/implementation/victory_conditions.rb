@@ -1,5 +1,6 @@
 require 'set'
 
+# Module containing victory conditions for different game modes.
 module VictoryConditions
 
 	ALL_DIRECTIONS = [
@@ -7,6 +8,8 @@ module VictoryConditions
 		[0 ,  1], [ 1, -1], [ 1, 0], [1,  1]
 	]
 
+	# Check for winners by checking block with 4 tokens in a row in each direction
+	# for all tokens. Set is used so a winner is only counted once.
 	private
 	def self.victory(board)
 		winners = Set.new
@@ -44,10 +47,12 @@ module VictoryConditions
 	end
 
 	public
+	# Victory condition for connect 4.
 	def self.connect4(board)
 		victory(board) { |a| Set.new(a).size == 1 }
 	end
 
+	# Victory condition for otto and toot.
 	def self.otto_and_toot(board)
 		victory(board) { |a|
 			a[0] == a[3] &&

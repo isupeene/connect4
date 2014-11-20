@@ -2,7 +2,7 @@ require_relative 'contracts/contract_decorator'
 require_relative 'contracts/game_contract'
 require_relative 'implementation/game_impl'
 
-# Class to create a controller implementation and decorate it with contracts
+# Class to create a game implementation and decorate it with contracts
 class Game
 	include ClassContractDecorator
 	include GameContract

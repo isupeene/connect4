@@ -1,5 +1,6 @@
 module GUIMultiplayerView
-	# Callback that game model calls when game changes.
+	# Callback that game model calls when game changes. Updates GUI
+	# board and message.
 	def turn_update(update)
 		if update[:board]
 			print_board(update[:board])

@@ -1,6 +1,8 @@
 require_relative 'cli_single_player_view'
 require_relative 'cli_otto_and_toot_view'
 
+# View for an otto and toot single player command line game. Most functionality provided through
+# the included modules.
 class CLIOttoAndTootSinglePlayerViewImpl
 	include CLISinglePlayerView
 	include CLIOttoAndTootView
@@ -10,6 +12,8 @@ class CLIOttoAndTootSinglePlayerViewImpl
 		@player_number = player_number
 	end
 
+	# Tell user what token they are playing and what they are trying to do. Then update
+	# the board using super to call the modules to update the board.
 	def turn_update(update)
 		super
 
