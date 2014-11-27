@@ -34,28 +34,44 @@ module DatabaseManagerContract
 		)
 	end
 	
-	def update_leaderboard_precondition(player, victory)
+	def save_results_precondition(player1, player2, game)
+		assert(game.is_a?(GameContract), "Can only save game results.")
 		assert(
-			(0..2) === victory,
-			"Player must have won, lost, or tied."
+			(0..2) === game.victory,
+			"Player must have won or a tie game."
 		)
 	end
 	
-	def update_leaderboard_invariant(player, victory, result)
-		old_stats = leaderboard[player]
-		if old_stats.nil?
-			old_stats = Stats.new
-		end
-		yield
-		new_stats = leaderboard[player]
-		msg = "Leaderboards failed to update."
-		case victory
-		when 0
-			assert_equals(old_stats.losses + 1, new_stats.losses, msg)
-		when 1
-			assert_equals(old_stats.wins + 1, new_stats.wins, msg)
-		when 2
-			assert_equals(old_stats.ties + 1, new_stats.ties, msg)
-		end
+	def save_results_postcondtion(player1, player2, game, result)
+		game_result = get_result(result)
+		assert(game_result.victory == game.victory && 
+			game_result.player1 == player1 && 
+			game_result.player2 == player2 && 
+			game_result.game_type == game.game_type,
+			"Result should be stored correctly."
+		)
+	end
+	
+	def get_result_precondition(id)
+		assert(id.is_a?(Integer), "Game results are given integer IDs in the MySQL database.")
+		assert(get_results.map{ |result| result.id }.include?(id), "The provided id should exist.")
+	end
+	
+	def get_result_postcondition(id, result)
+		assert(result.is_a?(Result), "A result is a result.")
+	end
+	
+	def get_results_postcondition(result)
+		assert(
+			result.is_a?(Enumerable) && result.all?{ |game_result| game_result.is_a?(GameResult)}, 
+			"Every result is a result."
+		)
+	end
+	
+	def leaderboards_postcondition(result)
+		assert(
+			result.is_a?(Enumerable) && result.all?{ |player_stats| player_stats.is_a?(Stats) },
+			"Every leaderboard entry contains a player's stats."
+		)
 	end
 end
