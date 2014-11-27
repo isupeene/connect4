@@ -1,5 +1,6 @@
 require 'test/unit'
 require_relative 'game_contract'
+require_relative '../result'
 require_relative '../stats'
 
 module DatabaseManagerContract
@@ -58,7 +59,7 @@ module DatabaseManagerContract
 	end
 	
 	def get_result_postcondition(id, result)
-		assert(result.is_a?(Result), "A result is a result.")
+		assert(result.is_a?(GameResult), "A result is a result.")
 	end
 	
 	def get_results_postcondition(result)
