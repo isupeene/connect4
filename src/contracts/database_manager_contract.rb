@@ -1,5 +1,6 @@
 require 'test/unit'
 require_relative 'game_contract'
+require_relative '../stats'
 
 module DatabaseManagerContract
 	def save_game_precondition(player1, player2, game)
@@ -31,5 +32,30 @@ module DatabaseManagerContract
 			result.is_a?(Enumerable) && result.all?{ |game| game.is_a?(GameContract) },
 			"Every game is a game!"
 		)
+	end
+	
+	def update_leaderboard_precondition(player, victory)
+		assert(
+			(0..2) === victory,
+			"Player must have won, lost, or tied."
+		)
+	end
+	
+	def update_leaderboard_invariant(player, victory, result)
+		old_stats = leaderboard[player]
+		if old_stats.nil?
+			old_stats = Stats.new
+		end
+		yield
+		new_stats = leaderboard[player]
+		msg = "Leaderboards failed to update."
+		case victory
+		when 0
+			assert_equals(old_stats.losses + 1, new_stats.losses, msg)
+		when 1
+			assert_equals(old_stats.wins + 1, new_stats.wins, msg)
+		when 2
+			assert_equals(old_stats.ties + 1, new_stats.ties, msg)
+		end
 	end
 end
