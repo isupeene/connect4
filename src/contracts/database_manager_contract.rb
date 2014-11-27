@@ -19,11 +19,11 @@ module DatabaseManagerContract
 		if result
 			assert(result.is_a?(GameContract), "A game is a game.")
 		else
-			assert(
-				!saved_games.map{ |entry| entry.id }.include?(id),
-				"If no game is returned, it means it was deleted before we could access it."
-			)
-		end
+		assert(
+			!saved_games.map{ |entry| entry.id }.include?(id),
+			"If we successfully loaded the game, the old save file will be deleted.\n" \
+			"If we failed to load the game, it means someone else got to it first, and it was deleted."
+		)
 	end
 	
 	def saved_games_postcondition(result)
