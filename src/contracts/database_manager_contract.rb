@@ -1,6 +1,6 @@
 require 'test/unit'
 require_relative 'game_contract'
-require_relative '../result'
+require_relative '../game_result'
 require_relative '../stats'
 
 module DatabaseManagerContract
