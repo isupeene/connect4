@@ -4,10 +4,6 @@ require_relative 'game_manager_contract'
 module GameServerContract
 	include GameManagerContract
 	
-	def join_precondition(player)
-		assert(players.length < 2, "There can be only 2.")
-	end
-	
 	def join_invariant(player)
 		old_players = players.dup
 		yield
@@ -15,10 +11,17 @@ module GameServerContract
 			old_players.all?{ |p| players.include?(p) },
 			"Everyone else is still here."
 		)
-	end
-	
-	def join_postcondition(player, result)
-		assert(players.include?(player), "The player has joined the game.")
+		if (old_players.length < 2)
+			assert(
+				players.include?(player),
+				"A player can join the game if there's room."
+			)
+		else
+			assert(
+				!players.include?(player),
+				"A player cannot join the game if there's not room."
+			)
+		end
 	end
 	
 	def start_game_precondition(game_options)
