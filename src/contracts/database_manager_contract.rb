@@ -18,7 +18,7 @@ module DatabaseManagerContract
 	def load_game_postcondition(id, result)
 		if result
 			assert(result.is_a?(GameContract), "A game is a game.")
-		else
+		end
 		assert(
 			!saved_games.map{ |entry| entry.id }.include?(id),
 			"If we successfully loaded the game, the old save file will be deleted.\n" \
