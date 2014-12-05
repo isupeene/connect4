@@ -1,4 +1,4 @@
-CREATE TABLE `SavedGames` IF NOT EXISTS
+CREATE TABLE IF NOT EXISTS SavedGames
 (
 GameId int NOT NULL,
 Player1 varchar(255) NOT NULL,
@@ -9,7 +9,7 @@ Board char(255) NOT NULL,
 PRIMARY KEY (GameId)
 ) ;
 
-CREATE TABLE `Results` IF NOT EXISTS
+CREATE TABLE IF NOT EXISTS Results
 (
 GameId int NOT NULL,
 Player1 varchar(255) NOT NULL,

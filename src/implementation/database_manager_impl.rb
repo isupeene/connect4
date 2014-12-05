@@ -3,6 +3,7 @@ require_relative '../game'
 require_relative 'game_board'
 require_relative 'game_result'
 require_relative '../stat'
+require_relative 'victory_conditions'
 
 class DatabaseManagerImpl
 	
@@ -15,12 +16,17 @@ class DatabaseManagerImpl
 		if game.id > 0
 			@db.query("INSERT INTO SavedGames (GameId, Player1, Player2, CurrentTurn, GameType, Board)
 				VALUES
-				(" + game.id +", '" + 
-				game.player_names[0] + "', '" + 
-				game.player_names[1] + "', " + 
-				game.current_turn + ", " + 
-				game.game_type + ", '" + 
-				game.board.to_s + "' )"
+				( #{game.id}, 
+				'#{game.player_names[0]}', 
+				'#{game.player_names[1]}', 
+				#{game.current_turn}, 
+				#{game.game_type}, 
+				'#{game.board.to_s}' )
+				ON DUPLICATE KEY UPDATE  
+					Player1=VALUES(Player1), 
+					Player2=VALUES(Player2), 
+					CurrentTurn=VALUES(CurrentTurn),
+					Board=VALUES(Board)"
 			)
 			if @db.affected_rows == 1
 				return game.id
@@ -30,14 +36,14 @@ class DatabaseManagerImpl
 	end
 	
 	def load_game(id)
-		res = @db.query("SELECT * FROM SavedGames WHERE GameId=" + id)
+		res = @db.query("SELECT * FROM SavedGames WHERE GameId=#{id}")
 		old_game = nil
 		if @db.affected_rows == 1
 			res.each_hash{ |row|
 				old_game = row_to_game(row)
 			}
 			@db.query("DELETE FROM SavedGames
-				WHERE GameId=" + id)
+				WHERE GameId=#{id}")
 		end
 		res.free
 		return old_game
@@ -45,14 +51,14 @@ class DatabaseManagerImpl
 	
 	def row_to_game(row)
 		options = {}
-		options[:id] = row['GameId']
+		options[:id] = row['GameId'].to_i
 		options[:player_names] = [row['Player1'], row['Player2']]
-		options[:current_turn] = row['CurrentTurn']
-		if row['GameType'] == 2
+		options[:current_turn] = row['CurrentTurn'].to_i
+		if row['GameType'].to_i == 2
 			options[:otto_and_toot] = true
 		end
 		options[:board] = GameBoard.load(row['Board'])
-		return Game.new(options, [], &get_victory_condition(options))
+		return Game.new(options, &get_victory_condition(options))
 	end
 	
 	def saved_games
@@ -69,11 +75,11 @@ class DatabaseManagerImpl
 		if game.id > 0
 			@db.query("INSERT INTO Results (GameId, Player1, Player2, Winner, GameType)
 				VALUES
-				(" + game.id +", '" + 
-				game.player_names[0] + "', '" + 
-				game.player_names[1] + "', " + 
-				game.get_winner + ", " + 
-				game.game_type + ")"
+				(#{game.id}, 
+				'#{game.player_names[0]}',  
+				'#{game.player_names[1]}', 
+				#{game.get_winner}, 
+				#{game.game_type} )"
 			)
 			if @db.affected_rows == 1
 				return game.id
@@ -83,7 +89,7 @@ class DatabaseManagerImpl
 	end
 	
 	def get_result(id)
-		res = @db.query("SELECT * FROM Results WHERE GameId=" + id)
+		res = @db.query("SELECT * FROM Results WHERE GameId=#{id}")
 		game_result = nil
 		if @db.affected_rows == 1
 			res.each_hash{ |row|
@@ -95,7 +101,7 @@ class DatabaseManagerImpl
 	end
 	
 	def row_to_result(row)
-		GameResult.new(row['GameId'], row['Player1'], row['Player2'], row['Winner'], row['GameType'])
+		GameResult.new(row['GameId'].to_i, row['Player1'], row['Player2'], row['Winner'].to_i, row['GameType'].to_i)
 	end
 	
 	def get_results
