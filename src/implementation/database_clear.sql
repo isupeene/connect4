@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS `SavedGames`;
+DROP TABLE IF EXISTS `Results`;
