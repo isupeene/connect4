@@ -28,10 +28,20 @@ if b == 16
 	puts "yay"
 end
 
-c =db_manager.load_game(options[:id])
-puts c.id
-puts c.player_names
-puts c.current_turn
-puts c.game_type
-puts c.board
+#db_manager.save_result(GameResult.new(15, "bob", "frank", 1, 1))
+#db_manager.save_result(GameResult.new(16, "bob", "frank", 1, 1))
+#db_manager.save_result(GameResult.new(17, "bob", "cindy", 2, 1))
+#db_manager.save_result(GameResult.new(18, "bob", "cindy", 0, 1))
+#db_manager.save_result(GameResult.new(19, "cindy", "bob", 0, 1))
+#db_manager.save_result(GameResult.new(20, "cindy", "bob", 2, 1))
+c = db_manager.leaderboards(1)
+puts c.length
+c.each{ |d|
+	puts d.name
+	puts d.wins
+	puts d.losses
+	puts d.ties
+}
+puts db_manager.largest_id
+
 

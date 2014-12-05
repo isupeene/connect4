@@ -35,7 +35,7 @@ module DatabaseManagerContract
 		)
 	end
 	
-	def save_results_precondition(player1, player2, game)
+	def save_result_precondition(player1, player2, game)
 		assert(game.is_a?(GameContract), "Can only save game results.")
 		assert(
 			(0..2) === game.victory,
@@ -43,7 +43,7 @@ module DatabaseManagerContract
 		)
 	end
 	
-	def save_results_postcondtion(player1, player2, game, result)
+	def save_result_postcondtion(player1, player2, game, result)
 		game_result = get_result(result)
 		assert(game_result.victory == game.victory && 
 			game_result.player1 == player1 && 

@@ -34,6 +34,23 @@ class DatabaseManagerImpl
 		end
 		return -1
 	end
+
+	# Can be called after initialization as for what GameId to start after.
+	def largest_id
+		max_in_saves = 0
+		max_in_results = 0
+		res = @db.query("SELECT MAX(GameId) as MaxId FROM SavedGames")
+		res.each_hash{|row|
+			max_in_saves = row['MaxId']
+		}
+		res.free
+		res = @db.query("SELECT MAX(GameId) as MaxId FROM Results")
+		res.each_hash{|row|
+			max_in_results = row['MaxId']
+		}
+		res.free
+		return [max_in_saves, max_in_results].max
+	end
 	
 	def load_game(id)
 		res = @db.query("SELECT * FROM SavedGames WHERE GameId=#{id}")
@@ -71,18 +88,18 @@ class DatabaseManagerImpl
 		return games
 	end
 	
-	def save_results(game)
-		if game.id > 0
+	def save_result(game_result)
+		if game_result.id > 0
 			@db.query("INSERT INTO Results (GameId, Player1, Player2, Winner, GameType)
 				VALUES
-				(#{game.id}, 
-				'#{game.player_names[0]}',  
-				'#{game.player_names[1]}', 
-				#{game.get_winner}, 
-				#{game.game_type} )"
+				(#{game_result.id}, 
+				'#{game_result.player1}',  
+				'#{game_result.player2}', 
+				#{game_result.winner}, 
+				#{game_result.game_type} )"
 			)
 			if @db.affected_rows == 1
-				return game.id
+				return game_result.id
 			end
 		end
 		return -1
@@ -105,7 +122,7 @@ class DatabaseManagerImpl
 	end
 	
 	def get_results
-		res = @db.query("SELECT * FROM SavedGames")
+		res = @db.query("SELECT * FROM Results")
 		results = []
 		res.each_hash{ |row|
 			results << row_to_result(row)
@@ -115,9 +132,9 @@ class DatabaseManagerImpl
 	end
 	
 	def leaderboards(game_type)
-		@db.query("DROP TABLE Player1 IF EXISTS")
-		@db.query("DROP TABLE Player2 IF EXISTS")
-		@db.query("CREATE TEMPORARY TABLE Player1 AS 
+		@db.query("DROP TABLE IF EXISTS Player1")
+		@db.query("DROP TABLE IF EXISTS Player2")
+		@db.query("CREATE TABLE Player1 AS 
 			(SELECT 
 				Player1 as Player,
 				sum(case when Winner = 1 then 1 else 0 end) as Wins,
@@ -129,7 +146,7 @@ class DatabaseManagerImpl
 				Player 
 			)"
 		)
-		@db.query("CREATE TEMPORARY TABLE Player2 AS 
+		@db.query("CREATE TABLE Player2 AS 
 			(SELECT 
 				Player2 as Player,
 				sum(case when Winner = 2 then 1 else 0 end) as Wins,
@@ -142,19 +159,31 @@ class DatabaseManagerImpl
 			)"
 		)
 		res = @db.query("SELECT 
-				(case when Player1.Player = NULL then Player2.Player else Player1.Player end) as Player,
-				(Player1.Wins + Player2.Wins) as Wins,
-				(Player1.Losses + Player2.Losses) as Losses,
-				(Player1.Ties + Player2.Ties) as Ties 
-			FROM Player1 
-			FULL OUTER JOIN Player2 
-			ON Player1.Player=Player2.Player 
-			ORDER BY Wins"
+				p1.Player as Player,
+				(p1.Wins + IFNULL(p2.Wins,0)) as Wins,
+				(p1.Losses + IFNULL(p2.Losses,0)) as Losses,
+				(p1.Ties + IFNULL(p2.Ties,0)) as Ties 
+			FROM Player1 as p1
+			LEFT OUTER JOIN Player2 as p2
+			ON p1.Player=p2.Player 
+			UNION ALL
+			SELECT 
+				p2.Player as Player,
+				p2.Wins as Wins,
+				p2.Losses as Losses,
+				p2.Ties as Ties 
+			FROM Player1 as p1 
+			RIGHT OUTER JOIN Player2 as p2 
+			ON p1.Player=p2.Player 
+			WHERE p1.Player is null
+			ORDER BY Wins DESC"
 		)
+		
 		rankings = []
 		res.each_hash{|row|
-			rankings << Stat.new(row['Player'], row['Wins'], row['Losses'], row['Ties'])
+			rankings << Stat.new(row['Player'], row['Wins'].to_i, row['Losses'].to_i, row['Ties'].to_i)
 		}
+		res.free
 		return rankings
 	end
 	
