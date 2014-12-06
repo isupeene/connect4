@@ -75,6 +75,7 @@ class GameServerImpl < GameManagerImpl
 		controllers = [1, 2].map{ |i| ControllerServerImpl.new(@game, i, id) }
 		controllers.each{ |c| @game.add_view(c) }
 
+		game_options.delete("board") # HACK
 		push_to_client(@players[1], "client.starting_remote_game", game_options, summarize_controller(controllers[1]))
 		return summarize_controller(controllers[0])
 	rescue Exception => ex
