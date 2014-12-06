@@ -90,7 +90,9 @@ class GameServerImpl < GameManagerImpl
 	end
 
 	def saved_games
-		@database.saved_games
+		result = @database.saved_games
+		result.each{ |g| g.delete("game") } # HACK!
+		return result
 	end
 
 	def saved_game_ids
