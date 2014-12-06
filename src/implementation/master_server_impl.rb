@@ -1,4 +1,5 @@
 require_relative 'game_server_impl' # TODO: no impl
+require_relative 'database_manager_impl'
 
 require 'xmlrpc/server'
 require 'socket'
@@ -12,6 +13,7 @@ class MasterServerImpl
 		@server = XMLRPC::Server.new(50550)
 		@server.add_handler("master", self)
 		Thread.new{ @server.serve }
+		@database = DatabaseManagerImpl.new
 	end
 
 	def shutdown
@@ -47,6 +49,10 @@ class MasterServerImpl
 			"number_of_players" => server.number_of_players,
 			"port" => server.port
 		}
+	end
+
+	def leaderboards
+		@database.leaderboards
 	end
 
 	def ping

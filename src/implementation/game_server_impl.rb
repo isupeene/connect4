@@ -37,6 +37,7 @@ class GameServerImpl < GameManagerImpl
 
 	def shutdown
 		@game.quit if game_in_progress
+		@game = nil
 		@server.shutdown
 		@master.notify(id)
 	end
@@ -123,7 +124,18 @@ class GameServerImpl < GameManagerImpl
 		XMLRPC::Client.new(player["hostname"], nil, player["port"]).call(command, *args)
 	end
 
-	#TODO: Save and load game will integrate with database.
-	#TODO: When game ends, players ranks will be updated.
+	def turn_update(update)
+		if update["game_over"]
+			if @game
+				@database.save_result({
+					"Player1" => @game.player_names[0],
+					"Player2" => @game.player_names[1],
+					"Winner" => update["winner"],
+					"GameType" => @game.game_type
+				})
+			end
+		end
+		super
+	end
 end
 
