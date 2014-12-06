@@ -61,6 +61,7 @@ class GameServerImpl < GameManagerImpl
 
 	def start_game(game_options)
 	begin
+		game_options["player_names"] = @players.map{ |p| p["username"] }
 		views = [
 			RemoteViewImpl.new(@players[0]),
 			RemoteViewImpl.new(@players[1]),
