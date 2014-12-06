@@ -45,7 +45,7 @@ class DatabaseManagerImpl
 	
 	def row_to_options(row)
 		options = {}
-		options['id'] = row['GameId']
+		options['id'] = row['GameId'].to_i
 		options['player_names'] = [row['Player1'], row['Player2']]
 		options['current_turn'] = row['CurrentTurn'].to_i
 		if row['GameType'].to_i == 2
