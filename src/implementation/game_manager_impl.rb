@@ -57,8 +57,11 @@ class GameManagerImpl
 
 	# End the current game
 	def end_game
-		@game.quit
+		# So that we don't update the leaderboards
+		# when a game is quit prematurely.
+		g = @game
 		@game = nil
+		g.quit
 		return true
 	end
 
