@@ -1,6 +1,7 @@
 require_relative 'game_manager_impl'
 require_relative 'remote_view_impl' # TODO: no impl
 require_relative 'controller_server_impl'
+require_relative 'database_manager_impl'
 require_relative '../game'
 
 require 'xmlrpc/client'
@@ -12,6 +13,7 @@ class GameServerImpl < GameManagerImpl
 		@id = id
 		@players = [player]
 		@master = master
+		@database = DatabaseManagerImpl.new
 
 		@game = nil
 		@server = XMLRPC::Server.new(port)
@@ -73,6 +75,7 @@ class GameServerImpl < GameManagerImpl
 		controllers = [1, 2].map{ |i| ControllerServerImpl.new(@game, i, id) }
 		controllers.each{ |c| @game.add_view(c) }
 
+		game_options.delete("board") # HACK
 		push_to_client(@players[1], "client.starting_remote_game", game_options, summarize_controller(controllers[1]))
 		return summarize_controller(controllers[0])
 	rescue Exception => ex
@@ -80,6 +83,29 @@ class GameServerImpl < GameManagerImpl
 		puts ex.backtrace
 		raise ex
 	end
+	end
+
+	def save_game
+		@database.save_game(@game)
+	end
+
+	def saved_games
+		result = @database.saved_games
+		result.each{ |g| g.delete("board") } # HACK!
+		return result
+	end
+
+	def saved_game_ids
+		@database.saved_game_ids
+	end
+
+	def load_game(id)
+		game_options = @database.load_game(id)
+		if game_options
+			start_game(game_options)
+		else
+			return false
+		end
 	end
 
 	def server_owner(player)

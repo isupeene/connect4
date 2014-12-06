@@ -62,8 +62,10 @@ class CLIClient
 				start_game(input_line)
 			elsif command == "save"
 				save_game
+			elsif command == "list-saved-games"
+				if_connected_to_game_server{ list_saved_games }
 			elsif command == "load"
-				load_game
+				load_game(input_line)
 			elsif command == "list-servers"
 				if_connected_to_master{ list_servers }
 			elsif command == "open-server"
@@ -223,16 +225,41 @@ class CLIClient
 		end
 	end
 
+	def list_saved_games
+		@out.puts(@game_manager.saved_games)
+	end
+
 	# Load saved game if there is one.
-	def load_game
-		# TODO: May need differences between local and remote saves.
-		if !@game_manager.save_file_present
-			@out.puts("No save file is available to load.")
-		elsif !@controllers = @game_manager.load_game
-			@out.puts("An error occurred while loading.")
+	def load_game(input_line)
+		if connected_to_game_server
+			id = input_line[0].to_i
+			saved_game = @game_manager.saved_games.find{ |g| g["id"] == id }
+			if saved_game
+				connection_info = @game_manager.load_game(id)
+				if connection_info
+					@controllers = RemoteControllerImpl.new(connection_info)
+					if saved_game["otto_and_toot"]
+						@remote_view.set_otto_and_toot
+					else
+						@remote_view.set_connect4
+					end
+					@remote_view.set_player_number(1)
+				else
+					@out.puts("An error occured while loading.")
+				end
+			else
+				@out.puts("No save game exists with this id.")
+			end
 		else
-			options = @game_manager.get_options
-			@game_manager.add_view(get_view(options))
+			if !@game_manager.save_file_present
+				@out.puts("No save file is available to load.")
+			elsif !@controllers = @game_manager.load_game
+				@out.puts("An error occurred while loading.")
+			else
+				options = @game_manager.get_options
+				@game_manager.add_view(get_view(options))
+			end
+			@remote_view.deactivate
 		end
 	end
 
