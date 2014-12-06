@@ -232,7 +232,7 @@ class CLIClient
 	# Load saved game if there is one.
 	def load_game(input_line)
 		if connected_to_game_server
-			id = input_line.to_i
+			id = input_line[0].to_i
 			saved_game = @game_manager.saved_games.find{ |g| g["id"] == id }
 			if saved_game
 				connection_info = @game_manager.load_game(id)
