@@ -198,10 +198,15 @@ class CLIClient
 	end
 
 	def set_master(hostname)
-		@master_server = RemoteMasterServerImpl.new({
+		master = RemoteMasterServerImpl.new({
 			"hostname" => hostname,
 			"port" => 50550
 		})
+		if master.ping
+			@master_server = master
+		else
+			puts "Could not connect to master server."
+		end
 	end
 
 	# End current game.
@@ -269,7 +274,17 @@ class CLIClient
 
 	def if_connected_to_master
 		if @master_server
-			yield
+			begin
+				yield
+			rescue Exception => ex
+				@out.puts(
+					"An error occurred communicating " \
+					"with the master server.\n" \
+					"You have been disconnected."
+				)
+				@master_server = nil
+				@game_manager = GameManager.new if connected_to_game_server
+			end
 		else
 			@out.puts("You're not connected to the master server!")
 		end
@@ -277,7 +292,16 @@ class CLIClient
 
 	def if_connected_to_game_server
 		if connected_to_game_server
-			yield
+			begin
+				yield
+			rescue Exception => ex
+				@out.puts(
+					"An error occurred communicating " \
+					"with the game server.\n" \
+					"You have been disconnected."
+				)
+				@game_manager = GameManager.new
+			end
 		else
 			@out.puts("You're not connected to a game server!")
 		end
