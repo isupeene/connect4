@@ -28,11 +28,6 @@ class CLIViewServerImpl
 	end
 
 	def turn_update(update)
-		# HACK: Can't send GameBoard object over XMLRPC
-		if update["board"]
-			update["board"] = GameBoard.load(update["board"])
-		end
-
 		if update["board"]
 			print_board(update["board"])
 		end

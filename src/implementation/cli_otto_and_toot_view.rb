@@ -1,3 +1,5 @@
+require_relative "game_board"
+
 module CLIOttoAndTootView
 	# Map players to tokens.
 	TOKEN_MAP = {
@@ -14,7 +16,7 @@ module CLIOttoAndTootView
 
 	# Define how to print an otto and toot board to the command line.
 	def print_board(board)
-		@out.puts(board.rows.map { |r|
+		@out.puts(GameBoard.load(board).rows.map { |r|
 			r.map{ |x| TOKEN_MAP[x] }.join(" ")
 		}.join("\n"))
 	end

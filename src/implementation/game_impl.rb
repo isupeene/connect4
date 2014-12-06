@@ -16,7 +16,7 @@ class GameImpl
 		@player_names = options['player_names'] || ["",""]
 		@game_type = options['otto_and_toot'] ? 2 : 1
 
-		update_views({"board" => board, "current_turn" => @current_turn})
+		update_views({"board" => board.to_s, "current_turn" => @current_turn})
 		game_thread = Thread.new{ main_loop }
 		game_thread.priority = 3
 	end
@@ -96,7 +96,6 @@ class GameImpl
 
 	# Update all listening views.
 	def update_views(update)
-		# HACK: can't send a GameBoard object over XMLRPC.
 		@views.each{ |v| v.turn_update(update) }
 	end
 

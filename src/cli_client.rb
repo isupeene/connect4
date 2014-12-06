@@ -3,7 +3,6 @@ require_relative 'cli_connect4_single_player_view'
 require_relative 'cli_connect4_multiplayer_view'
 require_relative 'cli_otto_and_toot_single_player_view'
 require_relative 'cli_otto_and_toot_multiplayer_view'
-require_relative 'cli_view_delegator'
 require_relative 'implementation/cli_view_server_impl' # TODO: no impl
 require_relative 'implementation/remote_controller_impl'
 require_relative 'implementation/remote_master_server_impl'
@@ -84,7 +83,7 @@ class CLIClient
 			end
 		}
 		ensure
-			leave_server if @game_server
+			leave_server if connected_to_game_server
 		end
 	end
 
