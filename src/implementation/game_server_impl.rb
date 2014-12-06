@@ -33,7 +33,7 @@ class GameServerImpl < GameManagerImpl
 		50500 + id
 	end
 
-	def shut_down
+	def shutdown
 		@game.quit if game_in_progress
 		@server.shutdown
 		@master.notify(id)
@@ -52,7 +52,7 @@ class GameServerImpl < GameManagerImpl
 	def leave(player)
 		@players.delete(player)
 		@game.quit if game_in_progress
-		shut_down if @players.empty?
+		shutdown if @players.empty?
 		return true
 	end
 

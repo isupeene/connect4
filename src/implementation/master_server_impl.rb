@@ -9,6 +9,14 @@ class MasterServerImpl
 
 	def initialize
 		@game_servers = [nil]*MAX_SERVERS
+		@server = XMLRPC::Server.new(50550)
+		@server.add_handler("master", self)
+		Thread.new{ @server.serve }
+	end
+
+	def shutdown
+		@game_servers.compact.each{ |s| s.shutdown }
+		@server.shutdown
 	end
 
 	def first_available_id
