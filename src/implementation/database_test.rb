@@ -1,8 +1,6 @@
 require_relative '../game'
-require_relative '../stat'
 require_relative 'game_board'
-require_relative 'game_result'
-require_relative 'database_manager_impl.rb'
+require_relative 'database_manager_impl'
 require_relative 'victory_conditions'
 
 # Choose victory condition based on game options
@@ -27,19 +25,30 @@ if b == 16
 	puts "yay"
 end
 
-db_manager.save_result(GameResult.new("bob", "frank", 1, 1))
-db_manager.save_result(GameResult.new("bob", "frank", 1, 1))
-db_manager.save_result(GameResult.new("bob", "cindy", 2, 1))
-db_manager.save_result(GameResult.new("bob", "cindy", 0, 1))
-db_manager.save_result(GameResult.new("cindy", "bob", 0, 1))
-db_manager.save_result(GameResult.new("cindy", "bob", 2, 1))
+db_manager.save_result({"Player1" => "bob", "Player2" => "frank", "Winner" => 1, "GameType" => 1})
+db_manager.save_result({"Player1" => "bob", "Player2" => "frank", "Winner" => 1, "GameType" => 1})
+db_manager.save_result({"Player1" => "bob", "Player2" => "cindy", "Winner" => 2, "GameType" => 1})
+db_manager.save_result({"Player1" => "bob", "Player2" => "cindy", "Winner" => 0, "GameType" => 1})
+db_manager.save_result({"Player1" => "bob", "Player2" => "frank", "Winner" => 1, "GameType" => 2})
+db_manager.save_result({"Player1" => "bob", "Player2" => "frank", "Winner" => 1, "GameType" => 2})
+db_manager.save_result({"Player1" => "bob", "Player2" => "cindy", "Winner" => 2, "GameType" => 2})
+db_manager.save_result({"Player1" => "bob", "Player2" => "cindy", "Winner" => 0, "GameType" => 2})
 c = db_manager.leaderboards(1)
 puts c.length
 c.each{ |d|
-	puts d.name
-	puts d.wins
-	puts d.losses
-	puts d.ties
+	puts d["Player"]
+	puts d["Wins"]
+	puts d["Losses"]
+	puts d["Ties"]
 }
+c = db_manager.leaderboards(2)
+puts c.length
+c.each{ |d|
+	puts d["Player"]
+	puts d["Wins"]
+	puts d["Losses"]
+	puts d["Ties"]
+}
+puts db_manager.saved_game_ids
 
 

@@ -1,8 +1,6 @@
 require 'mysql'
 require_relative '../game'
 require_relative 'game_board'
-require_relative 'game_result'
-require_relative '../stat'
 require_relative 'victory_conditions'
 
 class DatabaseManagerImpl
@@ -56,6 +54,16 @@ class DatabaseManagerImpl
 		options['board'] = GameBoard.load(row['Board'])
 		return Game.new(options, &get_victory_condition(options))
 	end
+
+	def saved_game_ids
+		res = @db.query("SELECT GameId FROM SavedGames")
+		game_ids = []
+		res.each_hash{ |row|
+			game_ids << row['GameId']
+		}
+		res.free
+		return game_ids
+	end
 	
 	def saved_games
 		res = @db.query("SELECT * FROM SavedGames")
@@ -70,10 +78,10 @@ class DatabaseManagerImpl
 	def save_result(game_result)
 		@db.query("INSERT INTO Results (Player1, Player2, Winner, GameType)
 			VALUES
-			('#{game_result.player1}',  
-			'#{game_result.player2}', 
-			#{game_result.winner}, 
-			#{game_result.game_type} )"
+			('#{game_result['Player1']}',  
+			'#{game_result['Player2']}', 
+			#{game_result['Winner']}, 
+			#{game_result['GameType']} )"
 		)
 		if @db.affected_rows == 1
 			return @db.insert_id
@@ -86,7 +94,7 @@ class DatabaseManagerImpl
 		game_result = nil
 		if @db.affected_rows == 1
 			res.each_hash{ |row|
-				game_result = row_to_game(row)
+				game_result = row_to_result(row)
 			}
 		end
 		res.free
@@ -94,7 +102,11 @@ class DatabaseManagerImpl
 	end
 	
 	def row_to_result(row)
-		GameResult.new( row['Player1'], row['Player2'], row['Winner'].to_i, row['GameType'].to_i)
+		return { "Player1" => row['Player1'],
+			"Player2" => row['Player2'],
+			"Winner" => row['Winner'].to_i,
+			"GameType" => row['GameType'].to_i
+		}
 	end
 	
 	def get_results
@@ -118,6 +130,8 @@ class DatabaseManagerImpl
 				sum(case when Winner = 0 then 1 else 0 end) as Ties 
 			FROM 
 				Results 
+			WHERE
+				GameType=#{game_type}
 			GROUP BY 
 				Player 
 			)"
@@ -130,6 +144,8 @@ class DatabaseManagerImpl
 				sum(case when Winner = 0 then 1 else 0 end) as Ties 
 			FROM 
 				Results 
+			WHERE
+				GameType=#{game_type}
 			GROUP BY 
 				Player 
 			)"
@@ -157,7 +173,11 @@ class DatabaseManagerImpl
 		
 		rankings = []
 		res.each_hash{|row|
-			rankings << Stat.new(row['Player'], row['Wins'].to_i, row['Losses'].to_i, row['Ties'].to_i)
+			rankings << { "Player" => row['Player'],
+				"Wins" => row['Wins'].to_i,
+				"Losses" => row['Losses'].to_i,
+				"Ties" => row['Ties'].to_i
+			}
 		}
 		res.free
 		return rankings
