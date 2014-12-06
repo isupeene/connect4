@@ -1,7 +1,6 @@
 require 'mysql'
 require_relative '../game'
 require_relative 'game_board'
-require_relative 'victory_conditions'
 
 class DatabaseManagerImpl
 	
@@ -27,15 +26,15 @@ class DatabaseManagerImpl
 		if @db.affected_rows == 1
 			return @db.insert_id
 		end
-		return -1
+		return false
 	end
 	
 	def load_game(id)
 		res = @db.query("SELECT * FROM SavedGames WHERE GameId=#{id}")
-		old_game = nil
+		old_game = false
 		if @db.affected_rows == 1
 			res.each_hash{ |row|
-				old_game = row_to_game(row)
+				old_game = row_to_options(row)
 			}
 			@db.query("DELETE FROM SavedGames
 				WHERE GameId=#{id}")
@@ -44,15 +43,16 @@ class DatabaseManagerImpl
 		return old_game
 	end
 	
-	def row_to_game(row)
+	def row_to_options(row)
 		options = {}
+		options['id'] = row['GameId']
 		options['player_names'] = [row['Player1'], row['Player2']]
 		options['current_turn'] = row['CurrentTurn'].to_i
 		if row['GameType'].to_i == 2
 			options['otto_and_toot'] = true
 		end
 		options['board'] = GameBoard.load(row['Board'])
-		return Game.new(options, &get_victory_condition(options))
+		return options
 	end
 
 	def saved_game_ids
@@ -69,7 +69,7 @@ class DatabaseManagerImpl
 		res = @db.query("SELECT * FROM SavedGames")
 		games = []
 		res.each_hash{ |row|
-			games << row_to_game(row)
+			games << row_to_options(row)
 		}
 		res.free
 		return games
@@ -86,7 +86,7 @@ class DatabaseManagerImpl
 		if @db.affected_rows == 1
 			return @db.insert_id
 		end
-		return -1
+		return false
 	end
 	
 	def get_result(id)
@@ -182,14 +182,4 @@ class DatabaseManagerImpl
 		res.free
 		return rankings
 	end
-	
-	# Choose victory condition based on game options
-	def get_victory_condition(game_options)
-		if game_options[:otto_and_toot]
-			Proc.new{ |b| VictoryConditions.otto_and_toot(b) }
-		else
-			Proc.new{ |b| VictoryConditions.connect4(b) }
-		end
-	end
-
 end

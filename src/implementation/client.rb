@@ -36,9 +36,9 @@ class Client
 	end
 
 	def method_missing(symbol, *args)
-		#puts "Calling #{target}.#{symbol}"
+		puts "Calling #{target}.#{symbol}"
 		result = client.call(target + "." + symbol.to_s, *args)
-		#puts "Returned from #{target}.#{symbol}"
+		puts "Returned from #{target}.#{symbol}"
 		return result
 	end
 
