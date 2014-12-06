@@ -63,7 +63,7 @@ class GameImpl
 	# Add another view to be updated to the game
 	def add_view(view)
 		@views << view
-		update_views({"board" => @board.to_s, "current_turn" => @current_turn})
+		view.turn_update({"board" => @board.to_s, "current_turn" => @current_turn})
 	end
 	
 	# Place a token equal to the player number in the column of the board.

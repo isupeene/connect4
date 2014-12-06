@@ -41,6 +41,10 @@ class MasterServerImpl
 		}
 	end
 
+	def ping
+		return true
+	end
+
 	def notify(id)
 		# This is likely to cause concurrency issues,
 		# because we will be able to immediately

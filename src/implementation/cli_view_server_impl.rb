@@ -8,7 +8,7 @@ class CLIViewServerImpl
 		@active_view = nil
 
 		@connect4_view = CLIConnect4MultiplayerViewImpl.new(@out)
-		@otto_and_toot_view = CLIConnect4MultiplayerViewImpl.new(@out)
+		@otto_and_toot_view = CLIOttoAndTootMultiplayerViewImpl.new(@out)
 	end
 
 	def set_otto_and_toot

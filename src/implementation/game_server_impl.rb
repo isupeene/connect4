@@ -51,6 +51,7 @@ class GameServerImpl < GameManagerImpl
 
 	def leave(player)
 		@players.delete(player)
+		@game.quit if game_in_progress
 		shut_down if @players.empty?
 		return true
 	end

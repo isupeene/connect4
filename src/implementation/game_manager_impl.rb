@@ -59,6 +59,7 @@ class GameManagerImpl
 	def end_game
 		@game.quit
 		@game = nil
+		return true
 	end
 
 	# Save current game state to a file for future playing.

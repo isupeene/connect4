@@ -11,7 +11,7 @@ class ControllerImpl
 
 	# Determine if it is this controller's turn.
 	def my_turn
-		game.current_turn == player_number
+		return result = game.current_turn == player_number
 	end
 
 	# Play a token in the game in the given column.
@@ -21,7 +21,7 @@ class ControllerImpl
 	end
 
 	def valid_move(column)
-		game.valid_move(column)
+		return result = game.valid_move(column)
 	end
 end
 
