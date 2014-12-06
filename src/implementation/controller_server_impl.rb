@@ -18,4 +18,3 @@ class ControllerServerImpl < ControllerImpl
 		@server.shutdown if update["game_over"]
 	end
 end
-

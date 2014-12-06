@@ -88,7 +88,7 @@ class CLIClient
 	end
 
 	def connected_to_game_server
-		# Kind of a hack?
+		# Kind of a hack? Maybe check for GameServerContract instead.
 		@game_manager.is_a?(RemoteGameManagerImpl)
 	end
 
@@ -297,7 +297,7 @@ class CLIClient
 			@out.puts("There is no current game in progress!")
 		elsif !my_turn
 			@out.puts("It's not your turn!")
-		elsif !current_controller.game.valid_move(column)
+		elsif !current_controller.valid_move(column)
 			@out.puts("You can't move there!")
 		else
 			current_controller.play(column)

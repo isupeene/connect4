@@ -16,10 +16,13 @@ class ControllerImpl
 
 	# Play a token in the game in the given column.
 	def play(column)
-		puts "Trying to play."
 		game.play(column, player_number)
-		puts "About to return true"
 		return true
 	end
+
+	def valid_move(column)
+		game.valid_move(column)
+	end
 end
+
 
