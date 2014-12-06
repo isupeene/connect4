@@ -52,7 +52,13 @@ class MasterServerImpl
 	end
 
 	def leaderboards
-		@database.leaderboards
+		begin
+			@database.leaderboards
+		rescue Exception ex
+			puts ex.message
+			puts ex.backtrace
+			raise ex
+		end
 	end
 
 	def ping
