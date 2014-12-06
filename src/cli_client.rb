@@ -232,7 +232,7 @@ class CLIClient
 	end
 
 	def show_leaderboards
-		@out.puts(@game_manager.leaderboards)
+		@out.puts(@master_server.leaderboards)
 	end
 
 	# Load saved game if there is one.
