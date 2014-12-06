@@ -100,7 +100,7 @@ class GameServerImpl < GameManagerImpl
 	end
 
 	def load_game(id)
-		game_options = @database.load_game
+		game_options = @database.load_game(id)
 		if game_options
 			start_game(game_options)
 		else
