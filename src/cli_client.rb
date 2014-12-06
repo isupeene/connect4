@@ -67,7 +67,7 @@ class CLIClient
 			elsif command == "load"
 				load_game(input_line)
 			elsif command == "show-leaderboards"
-				if_connected_to_master{ show_leaderboards }
+				if_connected_to_master{ show_leaderboards(input_line) }
 			elsif command == "list-servers"
 				if_connected_to_master{ list_servers }
 			elsif command == "open-server"
@@ -231,8 +231,10 @@ class CLIClient
 		@out.puts(@game_manager.saved_games)
 	end
 
-	def show_leaderboards
-		@out.puts(@master_server.leaderboards)
+	def show_leaderboards(input_line)
+		game_type = input_line[0].to_i
+		game_type = 1 unless [1, 2].include?(game_type)
+		@out.puts(@master_server.leaderboards(game_type))
 	end
 
 	# Load saved game if there is one.

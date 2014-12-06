@@ -51,9 +51,9 @@ class MasterServerImpl
 		}
 	end
 
-	def leaderboards
+	def leaderboards(game_type)
 		begin
-			@database.leaderboards
+			@database.leaderboards(game_type)
 		rescue Exception => ex
 			puts ex.message
 			puts ex.backtrace
