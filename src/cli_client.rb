@@ -65,7 +65,7 @@ class CLIClient
 			elsif command == "list-saved-games"
 				if_connected_to_game_server{ list_saved_games }
 			elsif command == "load"
-				load_game
+				load_game(input_line)
 			elsif command == "list-servers"
 				if_connected_to_master{ list_servers }
 			elsif command == "open-server"
