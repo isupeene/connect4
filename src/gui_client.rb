@@ -128,7 +128,7 @@ class GUIClient
 		clear_board
 		@current_game_type = @next_game_type
 		if @next_game_type == 2
-			game_options[:otto_and_toot] = true
+			game_options["otto_and_toot"] = true
 		end
 		
 		@controllers = @game_manager.start_game(game_options, get_view(game_options))
@@ -138,14 +138,14 @@ class GUIClient
 	
 	# Returns an appropriate view for the game based on the options.
 	def get_view(options)
-		if options[:single_player]
-			if options[:otto_and_toot]
+		if options["single_player"]
+			if options["otto_and_toot"]
 				GUIOttoAndTootSinglePlayerView.new(@buttons, @view_displays, 1)
 			else
 				GUIConnect4SinglePlayerView.new(@buttons, @view_displays, 1)
 			end
 		else
-			if options[:otto_and_toot]
+			if options["otto_and_toot"]
 				GUIOttoAndTootMultiplayerView.new(@buttons, @view_displays)
 			else
 				GUIConnect4MultiplayerView.new(@buttons, @view_displays)
@@ -209,7 +209,7 @@ class GUIClient
 		#	clear_board
 		#	options = @game_manager.get_options
 	#	
-	#		if options[:otto_and_toot]
+	#		if options["otto_and_toot"]
 	#			@current_game_type = 2
 	#		else
 	#			@current_game_type = 1

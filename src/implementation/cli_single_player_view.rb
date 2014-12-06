@@ -5,13 +5,13 @@ module CLISinglePlayerView
 	# to print specific messages and must then call super for proper
 	# functionality.
 	def turn_update(update)
-		if update[:board]
-			print_board(update[:board])
+		if update["board"]
+			print_board(update["board"])
 		end
 
-		if update[:game_over]
-			game_over(update[:winner])
-		elsif update[:current_turn] == @player_number
+		if update["game_over"]
+			game_over(update["winner"])
+		elsif update["current_turn"] == @player_number
 			puts("Your turn.")
 		else
 			puts("AI's turn")

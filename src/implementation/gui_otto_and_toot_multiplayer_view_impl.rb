@@ -17,9 +17,9 @@ class GUIOttoAndTootMultiplayerViewImpl
 	def turn_update(update)
 		super
 
-		unless update[:game_over]
-			@displays[1].set_label("You are placing #{TOKEN_MAP[update[:current_turn]]}.")
-			@displays[2].set_label("Try to spell the word '#{VICTORY_MAP[update[:current_turn]]}'.")
+		unless update["game_over"]
+			@displays[1].set_label("You are placing #{TOKEN_MAP[update["current_turn"]]}.")
+			@displays[2].set_label("Try to spell the word '#{VICTORY_MAP[update["current_turn"]]}'.")
 		end
 	end
 end

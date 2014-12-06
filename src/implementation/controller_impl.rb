@@ -17,6 +17,7 @@ class ControllerImpl
 	# Play a token in the game in the given column.
 	def play(column)
 		game.play(column, player_number)
+		return true
 	end
 end
 

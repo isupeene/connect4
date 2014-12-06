@@ -16,12 +16,12 @@ class CLIOttoAndTootMultiplayerViewImpl
 	def turn_update(update)
 		super
 
-		unless update[:game_over]
+		unless update["game_over"]
 			@out.puts(
 				"Place the letter " \
-				"'#{TOKEN_MAP[update[:current_turn]]}' " \
+				"'#{TOKEN_MAP[update["current_turn"]]}' " \
 				"to try to spell the word " \
-				"'#{VICTORY_MAP[update[:current_turn]]}'"
+				"'#{VICTORY_MAP[update["current_turn"]]}'"
 			)
 		end
 	end

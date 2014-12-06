@@ -2,13 +2,13 @@ module GUISinglePlayerView
 	# Callback that game model calls when game changes. Updates GUI
 	# board and message.
 	def turn_update(update)
-		if update[:board]
-			print_board(update[:board])
+		if update["board"]
+			print_board(update["board"])
 		end
 
-		if update[:game_over]
-			game_over(update[:winner])
-		elsif update[:current_turn] == @player_number
+		if update["game_over"]
+			game_over(update["winner"])
+		elsif update["current_turn"] == @player_number
 			@displays[0].set_label("Your turn.")
 		else
 			@displays[0].set_label("AI's turn")

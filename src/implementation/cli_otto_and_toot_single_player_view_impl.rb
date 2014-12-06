@@ -17,7 +17,7 @@ class CLIOttoAndTootSinglePlayerViewImpl
 	def turn_update(update)
 		super
 
-		if !update[:game_over] && update[:current_turn] == @player_number
+		if !update["game_over"] && update["current_turn"] == @player_number
 			@out.puts(
 				"Place the letter " \
 				"'#{TOKEN_MAP[@player_number]}' " \

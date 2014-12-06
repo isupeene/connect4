@@ -17,8 +17,8 @@ class GUIConnect4MultiplayerViewImpl
 	def turn_update(update)
 		super
 
-		unless update[:game_over]
-			@displays[1].set_label("You are #{TOKEN_MAP[update[:current_turn]]}.")
+		unless update["game_over"]
+			@displays[1].set_label("You are #{TOKEN_MAP[update["current_turn"]]}.")
 			@displays[2].set_label("Try to get 4 in a row.")
 		end
 	end

@@ -23,6 +23,14 @@ module GameServerContract
 			)
 		end
 	end
+
+	def leave_precondition(player)
+		players.include?(player)
+	end
+
+	def leave_postcondition(player, result)
+		!players.include?(player)
+	end
 	
 	def start_game_precondition(game_options)
 		super

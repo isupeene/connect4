@@ -18,7 +18,7 @@ class GUIOttoAndTootSinglePlayerViewImpl
 	def turn_update(update)
 		super
 
-		if !update[:game_over] && update[:current_turn] == @player_number
+		if !update["game_over"] && update["current_turn"] == @player_number
 			@displays[1].set_label("You are placing #{TOKEN_MAP[@player_number]}.")
 			@displays[2].set_label("Try to spell the word '#{VICTORY_MAP[@player_number]}'.")
 		end

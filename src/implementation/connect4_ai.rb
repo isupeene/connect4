@@ -16,10 +16,10 @@ class Connect4AI
 	def main_loop
 		loop {
 			update = @view.updates.pop
-			return if update[:game_over]
+			return if update["game_over"]
 
 			if @controller.my_turn
-				board = update[:board]
+				board = update["board"]
 				valid_options = board.width.times.select { |j|
 					board.number_of_tokens(j) < board.height
 				}
