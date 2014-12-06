@@ -18,7 +18,7 @@ class GUIConnect4SinglePlayerViewImpl
 	def turn_update(update)
 		super
 
-		if !update[:game_over] && update[:current_turn] == @player_number
+		if !update["game_over"] && update["current_turn"] == @player_number
 			@displays[1].set_label("You are #{TOKEN_MAP[@player_number]}.")
 			@displays[2].set_label("Try to get 4 in a row.")
 		end

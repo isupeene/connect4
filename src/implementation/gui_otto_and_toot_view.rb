@@ -1,3 +1,5 @@
+require_relative 'game_board'
+
 # Define how to update the GUI for an otto and toot game.
 module GUIOttoAndTootView
 	# Map player numbers to tokens.
@@ -15,7 +17,7 @@ module GUIOttoAndTootView
 
 	# Update GUI with values for tokens. 
 	def print_board(board)
-		board.each_with_index{ |x,i,j|
+		GameBoard.load(board).each_with_index{ |x,i,j|
 			button = @buttons[i][j]
 			button.set_label(TOKEN_MAP[x])
 		}

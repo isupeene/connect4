@@ -1,3 +1,5 @@
+require_relative 'game_board'
+
 # Define how to update GUI for connect 4 game
 module GUIConnect4View
 	# Map player number to tokens.
@@ -16,7 +18,7 @@ module GUIConnect4View
 	
 	# Update GUI with colors in places where tokens are.
 	def print_board(board)
-		board.each_with_index{ |x,i,j|
+		GameBoard.load(board).each_with_index{ |x,i,j|
 			button = @buttons[i][j]
 			button.modify_bg(Gtk::STATE_NORMAL, COLOR_MAP[x])
 		}

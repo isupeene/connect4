@@ -14,7 +14,7 @@ class GameManagerImpl
 	# views are the views that the game should provide
 	# updates to.
 	def start_game(game_options={}, *views)
-		views << AIView.new if game_options[:single_player]
+		views << AIView.new if game_options["single_player"]
 
 		@game = Game.new(
 			game_options,
@@ -23,7 +23,7 @@ class GameManagerImpl
 			&get_victory_condition(game_options)
 		)
 
-		if game_options[:single_player]
+		if game_options["single_player"]
 			get_ai_class(game_options).new(views[-1], Controller.new(@game, 2))
 			return Controller.new(@game, 1)
 		else
@@ -38,7 +38,7 @@ class GameManagerImpl
 
 	# Choose victory condition based on game options
 	def get_victory_condition(game_options)
-		if game_options[:otto_and_toot]
+		if game_options["otto_and_toot"]
 			Proc.new{ |b| VictoryConditions.otto_and_toot(b) }
 		else
 			Proc.new{ |b| VictoryConditions.connect4(b) }
@@ -59,6 +59,7 @@ class GameManagerImpl
 	def end_game
 		@game.quit
 		@game = nil
+		return true
 	end
 
 	# Save current game state to a file for future playing.
@@ -82,7 +83,7 @@ class GameManagerImpl
 				# Vulnerable to trojans;
 				# Don't play connect4 as root!
 				options = eval(savefile.readlines.join)
-				options[:board] = GameBoard.load(options[:board])
+				options["board"] = GameBoard.load(options["board"])
 			}
 			start_game(options)
 		rescue Exception => ex
@@ -103,6 +104,6 @@ class GameManagerImpl
 
 	# Callback that game model calls. Tells manager when game is over.
 	def turn_update(update)
-		@game = nil if update[:game_over]
+		@game = nil if update["game_over"]
 	end
 end
