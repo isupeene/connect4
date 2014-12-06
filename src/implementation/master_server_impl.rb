@@ -54,7 +54,7 @@ class MasterServerImpl
 	def leaderboards
 		begin
 			@database.leaderboards
-		rescue Exception ex
+		rescue Exception => ex
 			puts ex.message
 			puts ex.backtrace
 			raise ex
