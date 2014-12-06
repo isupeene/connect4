@@ -13,43 +13,23 @@ class DatabaseManagerImpl
 	end
 	
 	def save_game(game)
-		if game.id > 0
-			@db.query("INSERT INTO SavedGames (GameId, Player1, Player2, CurrentTurn, GameType, Board)
-				VALUES
-				( #{game.id}, 
-				'#{game.player_names[0]}', 
-				'#{game.player_names[1]}', 
-				#{game.current_turn}, 
-				#{game.game_type}, 
-				'#{game.board.to_s}' )
-				ON DUPLICATE KEY UPDATE  
-					Player1=VALUES(Player1), 
-					Player2=VALUES(Player2), 
-					CurrentTurn=VALUES(CurrentTurn),
-					Board=VALUES(Board)"
-			)
-			if @db.affected_rows == 1
-				return game.id
-			end
+		@db.query("INSERT INTO SavedGames (Player1, Player2, CurrentTurn, GameType, Board)
+			VALUES
+			( '#{game.player_names[0]}', 
+			'#{game.player_names[1]}', 
+			#{game.current_turn}, 
+			#{game.game_type}, 
+			'#{game.board.to_s}' )
+			ON DUPLICATE KEY UPDATE  
+				Player1=VALUES(Player1), 
+				Player2=VALUES(Player2), 
+				CurrentTurn=VALUES(CurrentTurn),
+				Board=VALUES(Board)"
+		)
+		if @db.affected_rows == 1
+			return @db.insert_id
 		end
 		return -1
-	end
-
-	# Can be called after initialization as for what GameId to start after.
-	def largest_id
-		max_in_saves = 0
-		max_in_results = 0
-		res = @db.query("SELECT MAX(GameId) as MaxId FROM SavedGames")
-		res.each_hash{|row|
-			max_in_saves = row['MaxId']
-		}
-		res.free
-		res = @db.query("SELECT MAX(GameId) as MaxId FROM Results")
-		res.each_hash{|row|
-			max_in_results = row['MaxId']
-		}
-		res.free
-		return [max_in_saves, max_in_results].max
 	end
 	
 	def load_game(id)
@@ -68,13 +48,12 @@ class DatabaseManagerImpl
 	
 	def row_to_game(row)
 		options = {}
-		options[:id] = row['GameId'].to_i
-		options[:player_names] = [row['Player1'], row['Player2']]
-		options[:current_turn] = row['CurrentTurn'].to_i
+		options['player_names'] = [row['Player1'], row['Player2']]
+		options['current_turn'] = row['CurrentTurn'].to_i
 		if row['GameType'].to_i == 2
-			options[:otto_and_toot] = true
+			options['otto_and_toot'] = true
 		end
-		options[:board] = GameBoard.load(row['Board'])
+		options['board'] = GameBoard.load(row['Board'])
 		return Game.new(options, &get_victory_condition(options))
 	end
 	
@@ -89,18 +68,15 @@ class DatabaseManagerImpl
 	end
 	
 	def save_result(game_result)
-		if game_result.id > 0
-			@db.query("INSERT INTO Results (GameId, Player1, Player2, Winner, GameType)
-				VALUES
-				(#{game_result.id}, 
-				'#{game_result.player1}',  
-				'#{game_result.player2}', 
-				#{game_result.winner}, 
-				#{game_result.game_type} )"
-			)
-			if @db.affected_rows == 1
-				return game_result.id
-			end
+		@db.query("INSERT INTO Results (Player1, Player2, Winner, GameType)
+			VALUES
+			('#{game_result.player1}',  
+			'#{game_result.player2}', 
+			#{game_result.winner}, 
+			#{game_result.game_type} )"
+		)
+		if @db.affected_rows == 1
+			return @db.insert_id
 		end
 		return -1
 	end
@@ -118,7 +94,7 @@ class DatabaseManagerImpl
 	end
 	
 	def row_to_result(row)
-		GameResult.new(row['GameId'].to_i, row['Player1'], row['Player2'], row['Winner'].to_i, row['GameType'].to_i)
+		GameResult.new( row['Player1'], row['Player2'], row['Winner'].to_i, row['GameType'].to_i)
 	end
 	
 	def get_results

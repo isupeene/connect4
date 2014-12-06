@@ -12,9 +12,8 @@ class GameImpl
 		@commands = Queue.new
 		@current_turn = options[:current_turn] || 1
 		@board = options[:board] || GameBoard.new
-		@player_names = options[:player_names] || ["",""]
-		@game_type = options[:otto_and_toot] ? 2 : 1
-		@id = options[:id] || -1
+		@player_names = options['player_names'] || ["",""]
+		@game_type = options['otto_and_toot'] ? 2 : 1
 
 		update_views({:board => board, :current_turn => @current_turn})
 		game_thread = Thread.new{ main_loop }
@@ -26,7 +25,6 @@ class GameImpl
 	attr_reader :board
 	attr_reader :player_names
 	attr_reader :game_type
-	attr_reader :id
 
 	# Loop that handles commands from controllers via a queue and then updates the board and
 	# the views after each command is processed.
