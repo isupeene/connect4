@@ -11,7 +11,7 @@ class Client
 	#
 	# 5 seconds is arbitrary - I think the actual timeout is more like
 	# 30 seconds.  If this turns out to be a problem, we can tweak this.
-	TIMEOUT = 5
+	TIMEOUT = 15
 
 	def initialize(connection_info)
 		@connection_info = connection_info
@@ -20,7 +20,6 @@ class Client
 
 	def client
 		if Time.now - @last_used > TIMEOUT
-			puts "timeout!"
 			# TODO: No localhost
 			@cached_client = XMLRPC::Client.new("localhost", nil, @connection_info["port"])
 		end
