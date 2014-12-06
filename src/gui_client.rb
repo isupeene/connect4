@@ -1,5 +1,7 @@
 require 'gtk2'
 require_relative "about_dialog"
+require_relative "change_master_dialog"
+require_relative "join_dialog"
 require_relative "load_dialog"
 require_relative "leaderboard_dialog"
 require_relative "name_dialog"
@@ -39,7 +41,7 @@ class GUIClient
 	      	
 			# Set up for new single player game
 			menu_option = @builder.get_object("imagemenuitem1")
-			menu_option.signal_connect( "activate" ) { set_up_board({:single_player => true}) }
+			menu_option.signal_connect( "activate" ) { set_up_board({"single_player" => true}) }
 	      	
 			# Set up for new 2 player game
 			menu_option = @builder.get_object("imagemenuitem2")
@@ -125,7 +127,7 @@ class GUIClient
 			@controllers = nil
 			@game_manager = GameManager.new
 			@master_server = nil
-			set_master("localhost") # TEMP: for testing
+			real_set_master("localhost") # TEMP: for testing
 			@remote_view = GUIViewServerImpl.new(@buttons, @view_displays)
 			
 			@port = 50530
@@ -201,15 +203,21 @@ class GUIClient
 		}
 	end
 	
-	def set_master
+	def real_set_master(hostname="")
+		unless hostname.empty?
+			@master_server = RemoteMasterServerImpl.new({
+				"hostname" => hostname,
+				"port" => 50550
+			})
+		end
+	end
+	
+	def set_master(hostname="")
 		if_online{
-			hostname = @change_master_dialog.run
 			unless hostname.empty?
-				@master_server = RemoteMasterServerImpl.new({
-					"hostname" => hostname,
-					"port" => 50550
-				})
+				hostname = @change_master_dialog.run
 			end
+			real_set_master(hostname)
 		}
 	end
 	
@@ -224,7 +232,7 @@ class GUIClient
 			# TODO: No localhost
 			@game_manager = RemoteGameManagerImpl.new(connection_info)
 		elsif
-			@message_dialog.puts("Attempt to open server failed.")
+			@message_dialog.run("Attempt to open server failed.")
 		end
 	end
 	
@@ -242,7 +250,7 @@ class GUIClient
 		if @view_server
 			yield
 		else
-			@message_dialog.puts("Not available in offline mode.")
+			@message_dialog.run("Not available in offline mode.")
 		end
 	end
 	
@@ -251,7 +259,7 @@ class GUIClient
 		if game_in_progress
  			yield
  		else
-			@message_dialog.puts("There's currently no game in progress!")
+			@message_dialog.run("There's currently no game in progress!")
  		end
  	end
  	
